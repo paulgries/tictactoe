@@ -1,8 +1,9 @@
 package game.request_ai_move;
 
-import game.GameState;
+import game.GameRenderState;
 import game.GameViewModel;
 import game.GameViewModelMapper;
+import game.SessionState;
 import game.request_ai_move.use_case.RequestAiMoveOutputBoundary;
 import game.request_ai_move.use_case.RequestAiMoveOutputData;
 import framework.UiScheduler;
@@ -27,12 +28,13 @@ public class RequestAiMovePresenter implements RequestAiMoveOutputBoundary {
     @Override
     public void prepareSuccessView(RequestAiMoveOutputData outputData) {
         uiScheduler.runOnUiThread(() -> {
-            final GameState state = gameViewModel.getState();
-            if (state.getCurrentGameState().equals(outputData.base())) {
-                state.setCurrentGameState(outputData.updatedState());
-                state.setBoard(GameViewModelMapper.toBoardViewModel(outputData.updatedState()));
-                state.setStatus(GameViewModelMapper.toStatusViewModel(outputData.updatedState()));
-                state.setError(null);
+            final SessionState session = gameViewModel.getSession();
+            if (session.getCurrentGameState().equals(outputData.base())) {
+                session.setCurrentGameState(outputData.updatedState());
+                final GameRenderState render = gameViewModel.getState();
+                render.setBoard(GameViewModelMapper.toBoardViewModel(outputData.updatedState()));
+                render.setStatus(GameViewModelMapper.toStatusViewModel(outputData.updatedState()));
+                render.setError(null);
                 gameViewModel.firePropertyChanged();
             }
         });
@@ -41,8 +43,7 @@ public class RequestAiMovePresenter implements RequestAiMoveOutputBoundary {
     @Override
     public void prepareFailView(String error) {
         uiScheduler.runOnUiThread(() -> {
-            final GameState state = gameViewModel.getState();
-            state.setError(error);
+            gameViewModel.getState().setError(error);
             gameViewModel.firePropertyChanged();
         });
     }

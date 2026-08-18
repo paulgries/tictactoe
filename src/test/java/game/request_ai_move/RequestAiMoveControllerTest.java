@@ -50,8 +50,8 @@ class RequestAiMoveControllerTest {
     void execute_RunsInteractorInBackgroundWithSnapshotAndStrategy() {
         game.domain.GameState current = game.domain.GameState.newGame(CONFIG_3X3);
         game.domain.GameState base = current.applyMove(new Position(0, 0));
-        gameViewModel.getState().setCurrentGameState(base);
-        gameViewModel.getState().setAiStrategy(Optional.of(fixedMoveStrategy));
+        gameViewModel.getSession().setCurrentGameState(base);
+        gameViewModel.getSession().setAiStrategy(Optional.of(fixedMoveStrategy));
 
         controller.execute();
 
@@ -69,7 +69,7 @@ class RequestAiMoveControllerTest {
     @Test
     void execute_NoStrategy_Throws() {
         game.domain.GameState current = game.domain.GameState.newGame(CONFIG_3X3);
-        gameViewModel.getState().setCurrentGameState(current);
+        gameViewModel.getSession().setCurrentGameState(current);
 
         assertThatThrownBy(() -> controller.execute()).isInstanceOf(NullPointerException.class);
     }

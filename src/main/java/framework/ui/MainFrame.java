@@ -1,7 +1,7 @@
 package framework.ui;
 
-import game.GameState;
 import game.GameOutcomeKind;
+import game.GameRenderState;
 import game.GameViewModel;
 import game.make_human_move.MakeHumanMoveController;
 import game.start_new_game.StartNewGameController;
@@ -96,7 +96,7 @@ public final class MainFrame extends JFrame implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        final GameState state = (GameState) evt.getNewValue();
+        final GameRenderState state = (GameRenderState) evt.getNewValue();
         if (state.getBoard() != null) {
             boardPanel.render(state.getBoard());
         }

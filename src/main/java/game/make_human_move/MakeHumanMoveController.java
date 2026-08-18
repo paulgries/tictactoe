@@ -1,7 +1,8 @@
 package game.make_human_move;
 
-import game.GameState;
+import game.GameSessionRules;
 import game.GameViewModel;
+import game.SessionState;
 import game.domain.Position;
 import game.make_human_move.use_case.MakeHumanMoveInputBoundary;
 import game.make_human_move.use_case.MakeHumanMoveInputData;
@@ -24,12 +25,13 @@ public class MakeHumanMoveController {
     }
 
     public void execute(int row, int column) {
-        final GameState state = gameViewModel.getState();
-        if (state.isGameOver() || state.isAiTurn()) {
+        final SessionState session = gameViewModel.getSession();
+        final game.domain.GameState state = session.getCurrentGameState();
+        if (state == null || state.isGameOver() || GameSessionRules.isAiTurn(session)) {
             return;
         }
 
         makeHumanMoveUseCase.execute(new MakeHumanMoveInputData(
-                state.getCurrentGameState(), new Position(row, column)));
+                state, new Position(row, column)));
     }
 }

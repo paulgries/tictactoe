@@ -2,7 +2,6 @@ package game.make_human_move;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import game.GameState;
 import game.GameViewModel;
 import game.domain.GameConfig;
 import game.domain.GameMode;
@@ -37,16 +36,15 @@ class MakeHumanMovePresenterTest {
 
         presenter.prepareSuccessView(new MakeHumanMoveOutputData(updated));
 
-        GameState state = gameViewModel.getState();
-        assertThat(state.getCurrentGameState()).isEqualTo(updated);
-        assertThat(state.getStatus().message()).isEqualTo("O's turn");
+        assertThat(gameViewModel.getSession().getCurrentGameState()).isEqualTo(updated);
+        assertThat(gameViewModel.getState().getStatus().message()).isEqualTo("O's turn");
         assertThat(fireCount).isEqualTo(1);
         assertThat(requestAiMoveCalls).isZero();
     }
 
     @Test
     void prepareSuccessView_AiModeWithAiTurn_RequestsAiMove() {
-        gameViewModel.getState().setMode(GameMode.HUMAN_VS_AI);
+        gameViewModel.getSession().setMode(GameMode.HUMAN_VS_AI);
         game.domain.GameState afterHumanMove = game.domain.GameState.newGame(CONFIG_3X3)
             .applyMove(new Position(0, 0));
 
@@ -57,7 +55,7 @@ class MakeHumanMovePresenterTest {
 
     @Test
     void prepareSuccessView_AiModeButGameOver_DoesNotRequestAiMove() {
-        gameViewModel.getState().setMode(GameMode.HUMAN_VS_AI);
+        gameViewModel.getSession().setMode(GameMode.HUMAN_VS_AI);
 
         presenter.prepareSuccessView(new MakeHumanMoveOutputData(GameFixtures.wonByX()));
 

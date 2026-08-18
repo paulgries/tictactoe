@@ -1,8 +1,10 @@
 package game.make_human_move;
 
-import game.GameState;
+import game.GameRenderState;
+import game.GameSessionRules;
 import game.GameViewModel;
 import game.GameViewModelMapper;
+import game.SessionState;
 import game.make_human_move.use_case.MakeHumanMoveOutputBoundary;
 import game.make_human_move.use_case.MakeHumanMoveOutputData;
 
@@ -24,22 +26,22 @@ public class MakeHumanMovePresenter implements MakeHumanMoveOutputBoundary {
 
     @Override
     public void prepareSuccessView(MakeHumanMoveOutputData outputData) {
-        final GameState state = gameViewModel.getState();
-        state.setCurrentGameState(outputData.updatedState());
-        state.setBoard(GameViewModelMapper.toBoardViewModel(outputData.updatedState()));
-        state.setStatus(GameViewModelMapper.toStatusViewModel(outputData.updatedState()));
-        state.setError(null);
+        final SessionState session = gameViewModel.getSession();
+        session.setCurrentGameState(outputData.updatedState());
+        final GameRenderState render = gameViewModel.getState();
+        render.setBoard(GameViewModelMapper.toBoardViewModel(outputData.updatedState()));
+        render.setStatus(GameViewModelMapper.toStatusViewModel(outputData.updatedState()));
+        render.setError(null);
         gameViewModel.firePropertyChanged();
 
-        if (state.isAiTurn()) {
+        if (GameSessionRules.isAiTurn(session)) {
             requestAiMove.run();
         }
     }
 
     @Override
     public void prepareFailView(String error) {
-        final GameState state = gameViewModel.getState();
-        state.setError(error);
+        gameViewModel.getState().setError(error);
         gameViewModel.firePropertyChanged();
     }
 }

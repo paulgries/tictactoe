@@ -1,7 +1,7 @@
 package game.request_ai_move;
 
-import game.GameState;
 import game.GameViewModel;
+import game.SessionState;
 import game.ai.AiStrategy;
 import game.request_ai_move.use_case.RequestAiMoveInputBoundary;
 import game.request_ai_move.use_case.RequestAiMoveInputData;
@@ -29,9 +29,9 @@ public class RequestAiMoveController {
     }
 
     public void execute() {
-        final GameState state = gameViewModel.getState();
-        final game.domain.GameState base = state.getCurrentGameState();
-        final AiStrategy strategy = state.getAiStrategy()
+        final SessionState session = gameViewModel.getSession();
+        final game.domain.GameState base = session.getCurrentGameState();
+        final AiStrategy strategy = session.getAiStrategy()
             .orElseThrow(() -> new NullPointerException("no AI strategy is active"));
 
         uiScheduler.runInBackground(() -> {

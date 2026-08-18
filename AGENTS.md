@@ -44,13 +44,17 @@ repo-specific details) to carry the workflow forward.
   `InputBoundary`, `InputData`, `Interactor`, `OutputBoundary`, `OutputData`.
   Interactors are `void` and receive the `OutputBoundary` in their
   constructor; the `OutputBoundary` is implemented by the capability's
-  **Presenter**, which updates the shared `GameViewModel`/`GameState` bean and
+  **Presenter**, which updates the shared `GameViewModel` state and
   fires a PropertyChange; the `InputBoundary` is held by the capability's thin
   **Controller**, which builds the `InputData` from view primitives.
-- View-state model: a `framework/ViewModel<T>` base plus a shared
-  presentation bean (`GameState`) holding both render data (board/status) and
-  session data (mode, AI strategy, stale-result base) that controllers and
-  presenters share across use cases; one `MainFrame` renders from it.
+- View-state model: a `framework/ViewModel<T>` base plus a view model
+  holding two separate states — a `SessionState` (current domain state,
+  mode, AI strategy) that controllers and presenters share across use cases,
+  and a `GameRenderState` (board/status/error) that the frame renders from.
+  Presenters update both and fire one property change; one `MainFrame`
+  renders from it. Presentation-side rules shared by several use cases (e.g.
+  "is the AI to move?") live in a small static helper (`GameSessionRules`),
+  not on the state beans, which stay dumb.
 - Navigation is presenter-driven: a `framework/ViewManager` +
   `ViewManagerModel` (`extends ViewModel<String>`) switches the card layout,
   presenters navigate by setting the view name (e.g. on success), and pure

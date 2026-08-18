@@ -2,7 +2,6 @@ package game.request_ai_move;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import game.GameState;
 import game.GameViewModel;
 import game.domain.GameConfig;
 import game.domain.Position;
@@ -36,17 +35,16 @@ class RequestAiMovePresenterTest {
         game.domain.GameState base = game.domain.GameState.newGame(CONFIG_3X3)
             .applyMove(new Position(0, 0));
         game.domain.GameState moved = base.applyMove(new Position(1, 1));
-        GameState session = gameViewModel.getState();
-        session.setCurrentGameState(base);
+        gameViewModel.getSession().setCurrentGameState(base);
 
         presenter.prepareSuccessView(new RequestAiMoveOutputData(moved, base));
 
         assertThat(scheduler.pendingUiTasks()).isEqualTo(1);
-        assertThat(gameViewModel.getState().getCurrentGameState()).isEqualTo(base);
+        assertThat(gameViewModel.getSession().getCurrentGameState()).isEqualTo(base);
 
         scheduler.runNextUiTask();
 
-        assertThat(gameViewModel.getState().getCurrentGameState()).isEqualTo(moved);
+        assertThat(gameViewModel.getSession().getCurrentGameState()).isEqualTo(moved);
         assertThat(gameViewModel.getState().getStatus().message()).isEqualTo("X's turn");
         assertThat(fireCount).isEqualTo(1);
     }
@@ -56,18 +54,17 @@ class RequestAiMovePresenterTest {
         game.domain.GameState base = game.domain.GameState.newGame(CONFIG_3X3)
             .applyMove(new Position(0, 0));
         game.domain.GameState moved = base.applyMove(new Position(1, 1));
-        GameState session = gameViewModel.getState();
-        session.setCurrentGameState(base);
+        gameViewModel.getSession().setCurrentGameState(base);
 
         presenter.prepareSuccessView(new RequestAiMoveOutputData(moved, base));
 
         // the session moved on (e.g. a restart) before the UI task ran
         game.domain.GameState fresh = GameFixtures.wonByX();
-        session.setCurrentGameState(fresh);
+        gameViewModel.getSession().setCurrentGameState(fresh);
 
         scheduler.runNextUiTask();
 
-        assertThat(gameViewModel.getState().getCurrentGameState()).isEqualTo(fresh);
+        assertThat(gameViewModel.getSession().getCurrentGameState()).isEqualTo(fresh);
         assertThat(fireCount).isZero();
     }
 

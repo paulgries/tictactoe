@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import framework.ViewManagerModel;
 import game.CellSymbol;
-import game.GameState;
+import game.GameRenderState;
 import game.GameViewModel;
 import game.ai.EasyAiStrategy;
 import game.domain.GameConfig;
@@ -21,7 +21,7 @@ class StartNewGamePresenterTest {
     private GameViewModel gameViewModel;
     private ViewManagerModel viewManagerModel;
     private StartNewGamePresenter presenter;
-    private GameState lastFiredState;
+    private GameRenderState lastFiredState;
     private int fireCount;
 
     @BeforeEach
@@ -29,7 +29,7 @@ class StartNewGamePresenterTest {
         gameViewModel = new GameViewModel();
         viewManagerModel = new ViewManagerModel();
         PropertyChangeListener listener = evt -> {
-            lastFiredState = (GameState) evt.getNewValue();
+            lastFiredState = (GameRenderState) evt.getNewValue();
             fireCount++;
         };
         gameViewModel.addPropertyChangeListener(listener);
@@ -43,15 +43,15 @@ class StartNewGamePresenterTest {
         presenter.prepareSuccessView(new StartNewGameOutputData(
                 fresh, GameMode.TWO_PLAYER, Optional.empty()));
 
-        GameState state = gameViewModel.getState();
-        assertThat(state.getCurrentGameState()).isEqualTo(fresh);
-        assertThat(state.getBoard().cells()).hasSize(9);
-        assertThat(state.getBoard().cells().get(0).symbol()).isEqualTo(CellSymbol.EMPTY);
-        assertThat(state.getStatus().message()).isEqualTo("X's turn");
-        assertThat(state.getMode()).isEqualTo(GameMode.TWO_PLAYER);
-        assertThat(state.getAiStrategy()).isEmpty();
+        assertThat(gameViewModel.getSession().getCurrentGameState()).isEqualTo(fresh);
+        assertThat(gameViewModel.getSession().getMode()).isEqualTo(GameMode.TWO_PLAYER);
+        assertThat(gameViewModel.getSession().getAiStrategy()).isEmpty();
+        GameRenderState render = gameViewModel.getState();
+        assertThat(render.getBoard().cells()).hasSize(9);
+        assertThat(render.getBoard().cells().get(0).symbol()).isEqualTo(CellSymbol.EMPTY);
+        assertThat(render.getStatus().message()).isEqualTo("X's turn");
         assertThat(fireCount).isEqualTo(1);
-        assertThat(lastFiredState).isSameAs(state);
+        assertThat(lastFiredState).isSameAs(render);
         assertThat(viewManagerModel.getState()).isEqualTo("game");
     }
 
@@ -62,9 +62,8 @@ class StartNewGamePresenterTest {
         presenter.prepareSuccessView(new StartNewGameOutputData(
                 fresh, GameMode.HUMAN_VS_AI, Optional.of(new EasyAiStrategy())));
 
-        GameState state = gameViewModel.getState();
-        assertThat(state.getMode()).isEqualTo(GameMode.HUMAN_VS_AI);
-        assertThat(state.getAiStrategy()).isPresent();
+        assertThat(gameViewModel.getSession().getMode()).isEqualTo(GameMode.HUMAN_VS_AI);
+        assertThat(gameViewModel.getSession().getAiStrategy()).isPresent();
     }
 
     @Test

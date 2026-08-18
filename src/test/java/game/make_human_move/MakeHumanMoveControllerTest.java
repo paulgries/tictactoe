@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import game.GameState;
 import game.GameViewModel;
 import game.domain.GameConfig;
 import game.domain.GameMode;
@@ -39,7 +38,7 @@ class MakeHumanMoveControllerTest {
     @Test
     void execute_PassesCurrentStateAndPosition() {
         game.domain.GameState current = game.domain.GameState.newGame(CONFIG_3X3);
-        gameViewModel.getState().setCurrentGameState(current);
+        gameViewModel.getSession().setCurrentGameState(current);
 
         controller.execute(1, 2);
 
@@ -52,7 +51,7 @@ class MakeHumanMoveControllerTest {
 
     @Test
     void execute_GameOver_IgnoresClick() {
-        gameViewModel.getState().setCurrentGameState(GameFixtures.wonByX());
+        gameViewModel.getSession().setCurrentGameState(GameFixtures.wonByX());
 
         controller.execute(0, 0);
 
@@ -61,8 +60,8 @@ class MakeHumanMoveControllerTest {
 
     @Test
     void execute_AiTurn_IgnoresClick() {
-        gameViewModel.getState().setMode(GameMode.HUMAN_VS_AI);
-        gameViewModel.getState().setCurrentGameState(
+        gameViewModel.getSession().setMode(GameMode.HUMAN_VS_AI);
+        gameViewModel.getSession().setCurrentGameState(
             game.domain.GameState.newGame(CONFIG_3X3).applyMove(new Position(0, 0)));
 
         controller.execute(1, 1);
