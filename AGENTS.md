@@ -51,6 +51,12 @@ repo-specific details) to carry the workflow forward.
   presentation bean (`GameState`) holding both render data (board/status) and
   session data (mode, AI strategy, stale-result base) that controllers and
   presenters share across use cases; one `MainFrame` renders from it.
+- Navigation is presenter-driven: a `framework/ViewManager` +
+  `ViewManagerModel` (`extends ViewModel<String>`) switches the card layout,
+  presenters navigate by setting the view name (e.g. on success), and pure
+  screen switches go through the boundaries as a second method
+  (`switchToSetupView`, like CAWithBuilder's `switchToLoginView`). Card
+  names come from `getViewName()` on the views.
 - Wiring in `app/AppBuilder` (per-frame wiring methods); `Main` stays thin.
 - Controllers/presenters may inject a `UiScheduler` (`framework`) to move
   work off the UI thread; stale background results are discarded by comparing
