@@ -13,8 +13,11 @@ import game.request_ai_move.use_case.RequestAiMoveInteractor;
 import game.start_new_game.StartNewGameController;
 import game.start_new_game.StartNewGamePresenter;
 import game.start_new_game.use_case.StartNewGameInteractor;
+import framework.ViewManager;
+import framework.ViewManagerModel;
 import framework.ui.EffectOverlayPanel;
 import framework.ui.MainFrame;
+import framework.ui.SetupPanel;
 import framework.ui.SwingUiScheduler;
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -30,12 +33,16 @@ public class AppBuilder {
     private final SwingUiScheduler uiScheduler = new SwingUiScheduler();
     private final GameStateFactory gameStateFactory = new CommonGameStateFactory();
     private final AiStrategyFactory aiStrategyFactory = new AiStrategyFactory();
+    private final ViewManagerModel viewManagerModel = new ViewManagerModel();
 
     private MainFrame frame;
+    private ViewManager viewManager;
     private RequestAiMoveController requestAiMoveController;
 
     public AppBuilder addGameView() {
         frame = new MainFrame(gameViewModel);
+        viewManager = new ViewManager(
+                frame.getCardPanel(), frame.getCardLayout(), viewManagerModel);
 
         final EffectOverlayPanel effects = new EffectOverlayPanel();
         frame.setGlassPane(effects);
@@ -65,8 +72,8 @@ public class AppBuilder {
     }
 
     public AppBuilder addStartNewGameUseCase() {
-        final StartNewGamePresenter startNewGamePresenter =
-                new StartNewGamePresenter(gameViewModel);
+        final StartNewGamePresenter startNewGamePresenter = new StartNewGamePresenter(
+                gameViewModel, viewManagerModel, SetupPanel.VIEW_NAME);
         final StartNewGameController startNewGameController = new StartNewGameController(
                 new StartNewGameInteractor(
                         startNewGamePresenter, gameStateFactory, aiStrategyFactory));
@@ -75,6 +82,8 @@ public class AppBuilder {
     }
 
     public JFrame build() {
+        viewManagerModel.setState(frame.setupPanel().getViewName());
+        viewManagerModel.firePropertyChanged();
         return frame;
     }
 

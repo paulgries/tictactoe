@@ -67,4 +67,11 @@ class StartNewGameInteractorTest {
         assertThat(captor.getValue().mode()).isEqualTo(GameMode.HUMAN_VS_AI);
         assertThat(captor.getValue().aiStrategy()).isPresent();
     }
+
+    @Test
+    void switchToSetupView_DelegatesToPresenter() {
+        interactor.switchToSetupView();
+
+        verify(presenter).switchToSetupView();
+    }
 }

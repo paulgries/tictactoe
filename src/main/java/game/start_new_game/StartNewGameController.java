@@ -34,4 +34,8 @@ public class StartNewGameController {
     public void restart() {
         startNewGameUseCase.execute(lastInput);
     }
+
+    public void switchToSetupView() {
+        startNewGameUseCase.switchToSetupView();
+    }
 }

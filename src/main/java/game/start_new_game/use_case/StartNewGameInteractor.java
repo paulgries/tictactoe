@@ -35,4 +35,9 @@ public final class StartNewGameInteractor implements StartNewGameInputBoundary {
                 inputData.mode(),
                 aiStrategy));
     }
+
+    @Override
+    public void switchToSetupView() {
+        presenter.switchToSetupView();
+    }
 }

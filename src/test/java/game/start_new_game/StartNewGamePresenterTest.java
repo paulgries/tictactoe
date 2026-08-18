@@ -2,6 +2,7 @@ package game.start_new_game;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import framework.ViewManagerModel;
 import game.CellSymbol;
 import game.GameState;
 import game.GameViewModel;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test;
 class StartNewGamePresenterTest {
 
     private GameViewModel gameViewModel;
+    private ViewManagerModel viewManagerModel;
     private StartNewGamePresenter presenter;
     private GameState lastFiredState;
     private int fireCount;
@@ -25,12 +27,13 @@ class StartNewGamePresenterTest {
     @BeforeEach
     void setUp() {
         gameViewModel = new GameViewModel();
+        viewManagerModel = new ViewManagerModel();
         PropertyChangeListener listener = evt -> {
             lastFiredState = (GameState) evt.getNewValue();
             fireCount++;
         };
         gameViewModel.addPropertyChangeListener(listener);
-        presenter = new StartNewGamePresenter(gameViewModel);
+        presenter = new StartNewGamePresenter(gameViewModel, viewManagerModel, "setup");
     }
 
     @Test
@@ -49,6 +52,7 @@ class StartNewGamePresenterTest {
         assertThat(state.getAiStrategy()).isEmpty();
         assertThat(fireCount).isEqualTo(1);
         assertThat(lastFiredState).isSameAs(state);
+        assertThat(viewManagerModel.getState()).isEqualTo("game");
     }
 
     @Test
@@ -79,5 +83,13 @@ class StartNewGamePresenterTest {
 
         assertThat(gameViewModel.getState().getError()).isEqualTo("boom");
         assertThat(fireCount).isEqualTo(1);
+        assertThat(viewManagerModel.getState()).isEmpty();
+    }
+
+    @Test
+    void switchToSetupView_NavigatesToSetupView() {
+        presenter.switchToSetupView();
+
+        assertThat(viewManagerModel.getState()).isEqualTo("setup");
     }
 }

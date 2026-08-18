@@ -16,11 +16,11 @@ public final class StatusPanel extends JPanel {
     private final JButton changeSettingsButton = new JButton("Change Settings");
     private final JPanel buttonPanel = new JPanel();
 
-    public StatusPanel(MainFrame mainFrame) {
+    public StatusPanel() {
         setLayout(new BorderLayout());
 
         restartButton.addActionListener(e -> startNewGameController.restart());
-        changeSettingsButton.addActionListener(e -> mainFrame.showSetupScreen());
+        changeSettingsButton.addActionListener(e -> startNewGameController.switchToSetupView());
 
         buttonPanel.add(restartButton);
         buttonPanel.add(changeSettingsButton);

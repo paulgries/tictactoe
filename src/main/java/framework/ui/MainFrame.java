@@ -22,8 +22,6 @@ import javax.swing.JPanel;
  */
 public final class MainFrame extends JFrame implements PropertyChangeListener {
 
-    private static final String SETUP_CARD = "setup";
-    private static final String GAME_CARD = "game";
     private static final int WINDOW_WIDTH = 520;
     private static final int WINDOW_HEIGHT = 600;
     private static final double BORDER_FRACTION = 0.05;
@@ -43,15 +41,15 @@ public final class MainFrame extends JFrame implements PropertyChangeListener {
         this.gameViewModel = gameViewModel;
         gameViewModel.addPropertyChangeListener(this);
 
-        setupPanel = new SetupPanel(this);
+        setupPanel = new SetupPanel();
         boardPanel = new BoardPanel();
-        statusPanel = new StatusPanel(this);
+        statusPanel = new StatusPanel();
 
         gamePanel.add(boardPanel, BorderLayout.CENTER);
         gamePanel.add(statusPanel, BorderLayout.SOUTH);
 
-        cardPanel.add(setupPanel, SETUP_CARD);
-        cardPanel.add(gamePanel, GAME_CARD);
+        cardPanel.add(setupPanel, setupPanel.getViewName());
+        cardPanel.add(gamePanel, gameViewModel.getViewName());
         int horizontalBorder = (int) (WINDOW_WIDTH * BORDER_FRACTION);
         int verticalBorder = (int) (WINDOW_HEIGHT * BORDER_FRACTION);
         cardPanel.setBorder(BorderFactory.createEmptyBorder(
@@ -84,12 +82,12 @@ public final class MainFrame extends JFrame implements PropertyChangeListener {
         this.winEffects = winEffects;
     }
 
-    public void showGameScreen() {
-        cardLayout.show(cardPanel, GAME_CARD);
+    public JPanel getCardPanel() {
+        return cardPanel;
     }
 
-    public void showSetupScreen() {
-        cardLayout.show(cardPanel, SETUP_CARD);
+    public CardLayout getCardLayout() {
+        return cardLayout;
     }
 
     public SetupPanel setupPanel() {

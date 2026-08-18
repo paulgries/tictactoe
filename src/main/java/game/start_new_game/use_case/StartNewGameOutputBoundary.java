@@ -16,4 +16,10 @@ public interface StartNewGameOutputBoundary {
      * @param error the explanation of the failure
      */
     void prepareFailView(String error);
+
+    /**
+     * Switches to the setup view, as the CAWithBuilder signup boundary
+     * switches to the login view.
+     */
+    void switchToSetupView();
 }

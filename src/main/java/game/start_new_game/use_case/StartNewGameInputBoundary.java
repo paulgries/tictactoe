@@ -10,4 +10,10 @@ public interface StartNewGameInputBoundary {
      * @param inputData the input data
      */
     void execute(StartNewGameInputData inputData);
+
+    /**
+     * Switches to the setup view, as the CAWithBuilder signup boundary
+     * switches to the login view.
+     */
+    void switchToSetupView();
 }

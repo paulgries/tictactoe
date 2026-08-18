@@ -65,4 +65,11 @@ class StartNewGameControllerTest {
             .containsOnly(captor.getAllValues().get(0).config());
         assertThat(captor.getValue().mode()).isEqualTo(GameMode.TWO_PLAYER);
     }
+
+    @Test
+    void switchToSetupView_DelegatesToUseCase() {
+        controller.switchToSetupView();
+
+        verify(startNewGameUseCase).switchToSetupView();
+    }
 }

@@ -23,9 +23,10 @@ import javax.swing.SpinnerNumberModel;
 
 public final class SetupPanel extends JPanel {
 
+    public static final String VIEW_NAME = "setup";
+
     private static final int START_BUTTON_OUTLINE_THICKNESS = 3;
 
-    private final MainFrame mainFrame;
     private StartNewGameController startNewGameController;
 
     private final JSpinner boardSizeSpinner = new JSpinner(new SpinnerNumberModel(3, 2, 10, 1));
@@ -41,8 +42,7 @@ public final class SetupPanel extends JPanel {
     private final JPanel startButtonOutline = new JPanel(new BorderLayout());
     private final List<JLabel> labels = new ArrayList<>();
 
-    public SetupPanel(MainFrame mainFrame) {
-        this.mainFrame = mainFrame;
+    public SetupPanel() {
         setLayout(new GridLayout(0, 2, 8, 8));
 
         ButtonGroup modeGroup = new ButtonGroup();
@@ -110,6 +110,10 @@ public final class SetupPanel extends JPanel {
         this.startNewGameController = startNewGameController;
     }
 
+    public String getViewName() {
+        return VIEW_NAME;
+    }
+
     public boolean isConfettiEffectEnabled() {
         return confettiCheckBox.isSelected();
     }
@@ -141,7 +145,6 @@ public final class SetupPanel extends JPanel {
 
         try {
             startNewGameController.execute(boardSize, winLength, mode, difficulty);
-            mainFrame.showGameScreen();
         } catch (InvalidGameConfigException ex) {
             JOptionPane.showMessageDialog(
                 this, ex.getMessage(), "Invalid Settings", JOptionPane.ERROR_MESSAGE);
