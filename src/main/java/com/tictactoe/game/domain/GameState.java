@@ -1,6 +1,6 @@
-package com.tictactoe.domain;
+package com.tictactoe.game.domain;
 
-import com.tictactoe.domain.exception.InvalidMoveException;
+import com.tictactoe.game.domain.exception.InvalidMoveException;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,7 +9,7 @@ public record GameState(Board board, Mark currentTurn, GameConfig config, GameSt
     public static final Mark STARTING_MARK = Mark.X;
 
     public static GameState newGame(GameConfig config) {
-        return new GameState(new Board(config.boardSize()), STARTING_MARK, config, new InProgress());
+        return GameStateFactory.newGame(config);
     }
 
     public boolean isGameOver() {

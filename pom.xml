@@ -52,7 +52,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.5.0</version>
                 <configuration>
-                    <mainClass>com.tictactoe.infra.Main</mainClass>
+                    <mainClass>com.tictactoe.framework.Main</mainClass>
                 </configuration>
             </plugin>
         </plugins>
