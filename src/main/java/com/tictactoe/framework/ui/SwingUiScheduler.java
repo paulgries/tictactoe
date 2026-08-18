@@ -1,6 +1,6 @@
-package com.tictactoe.infra.ui;
+package com.tictactoe.framework.ui;
 
-import com.tictactoe.adapters.UiScheduler;
+import com.tictactoe.game.adapters.UiScheduler;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.swing.SwingUtilities;

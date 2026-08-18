@@ -1,11 +1,11 @@
-package com.tictactoe.infra.ui;
+package com.tictactoe.framework.ui;
 
-import com.tictactoe.adapters.GameController;
-import com.tictactoe.adapters.viewmodel.BoardViewModel;
-import com.tictactoe.adapters.viewmodel.CellSymbol;
-import com.tictactoe.adapters.viewmodel.CellViewModel;
-import com.tictactoe.adapters.viewmodel.GameOutcomeKind;
-import com.tictactoe.domain.Position;
+import com.tictactoe.game.adapters.GameController;
+import com.tictactoe.game.adapters.viewmodel.BoardViewModel;
+import com.tictactoe.game.adapters.viewmodel.CellSymbol;
+import com.tictactoe.game.adapters.viewmodel.CellViewModel;
+import com.tictactoe.game.adapters.viewmodel.GameOutcomeKind;
+import com.tictactoe.game.domain.Position;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Insets;

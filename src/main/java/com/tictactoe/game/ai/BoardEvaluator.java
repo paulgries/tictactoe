@@ -1,11 +1,11 @@
-package com.tictactoe.domain.ai;
+package com.tictactoe.game.ai;
 
-import com.tictactoe.domain.Board;
-import com.tictactoe.domain.GameConfig;
-import com.tictactoe.domain.LineGenerator;
-import com.tictactoe.domain.LineGenerator.Line;
-import com.tictactoe.domain.Mark;
-import com.tictactoe.domain.Position;
+import com.tictactoe.game.domain.Board;
+import com.tictactoe.game.domain.GameConfig;
+import com.tictactoe.game.domain.LineGenerator;
+import com.tictactoe.game.domain.LineGenerator.Line;
+import com.tictactoe.game.domain.Mark;
+import com.tictactoe.game.domain.Position;
 import java.util.Optional;
 
 public final class BoardEvaluator {

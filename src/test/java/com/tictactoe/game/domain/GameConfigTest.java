@@ -1,9 +1,9 @@
-package com.tictactoe.domain;
+package com.tictactoe.game.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.tictactoe.domain.exception.InvalidGameConfigException;
+import com.tictactoe.game.domain.exception.InvalidGameConfigException;
 import org.junit.jupiter.api.Test;
 
 class GameConfigTest {

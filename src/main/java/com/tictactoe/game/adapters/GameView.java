@@ -1,7 +1,7 @@
-package com.tictactoe.adapters;
+package com.tictactoe.game.adapters;
 
-import com.tictactoe.adapters.viewmodel.BoardViewModel;
-import com.tictactoe.adapters.viewmodel.StatusViewModel;
+import com.tictactoe.game.adapters.viewmodel.BoardViewModel;
+import com.tictactoe.game.adapters.viewmodel.StatusViewModel;
 
 public interface GameView {
 

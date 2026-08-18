@@ -1,8 +1,8 @@
-package com.tictactoe.domain;
+package com.tictactoe.game.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tictactoe.domain.LineGenerator.Line;
+import com.tictactoe.game.domain.LineGenerator.Line;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

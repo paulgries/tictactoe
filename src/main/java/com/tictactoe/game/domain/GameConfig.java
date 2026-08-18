@@ -1,6 +1,6 @@
-package com.tictactoe.domain;
+package com.tictactoe.game.domain;
 
-import com.tictactoe.domain.exception.InvalidGameConfigException;
+import com.tictactoe.game.domain.exception.InvalidGameConfigException;
 
 public record GameConfig(int boardSize, int winLength) {
 

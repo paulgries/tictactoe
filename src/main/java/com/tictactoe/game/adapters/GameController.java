@@ -1,16 +1,16 @@
-package com.tictactoe.adapters;
+package com.tictactoe.game.adapters;
 
-import com.tictactoe.application.AiStrategyFactory;
-import com.tictactoe.application.NewGameRequest;
-import com.tictactoe.application.usecase.MakeHumanMoveUseCase;
-import com.tictactoe.application.usecase.RequestAiMoveUseCase;
-import com.tictactoe.application.usecase.StartNewGameUseCase;
-import com.tictactoe.domain.GameMode;
-import com.tictactoe.domain.GameState;
-import com.tictactoe.domain.Mark;
-import com.tictactoe.domain.Position;
-import com.tictactoe.domain.ai.AiStrategy;
-import com.tictactoe.domain.exception.InvalidMoveException;
+import com.tictactoe.game.ai.AiStrategy;
+import com.tictactoe.game.ai.AiStrategyFactory;
+import com.tictactoe.game.NewGameRequest;
+import com.tictactoe.game.use_case.MakeHumanMoveUseCase;
+import com.tictactoe.game.use_case.RequestAiMoveUseCase;
+import com.tictactoe.game.use_case.StartNewGameUseCase;
+import com.tictactoe.game.domain.GameMode;
+import com.tictactoe.game.domain.GameState;
+import com.tictactoe.game.domain.Mark;
+import com.tictactoe.game.domain.Position;
+import com.tictactoe.game.domain.exception.InvalidMoveException;
 import java.util.Optional;
 
 public final class GameController {

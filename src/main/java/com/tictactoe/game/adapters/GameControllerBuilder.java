@@ -1,9 +1,9 @@
-package com.tictactoe.adapters;
+package com.tictactoe.game.adapters;
 
-import com.tictactoe.application.AiStrategyFactory;
-import com.tictactoe.application.usecase.MakeHumanMoveUseCase;
-import com.tictactoe.application.usecase.RequestAiMoveUseCase;
-import com.tictactoe.application.usecase.StartNewGameUseCase;
+import com.tictactoe.game.ai.AiStrategyFactory;
+import com.tictactoe.game.use_case.MakeHumanMoveUseCase;
+import com.tictactoe.game.use_case.RequestAiMoveUseCase;
+import com.tictactoe.game.use_case.StartNewGameUseCase;
 import java.util.Objects;
 
 /**

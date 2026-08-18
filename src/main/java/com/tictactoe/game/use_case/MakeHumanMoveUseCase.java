@@ -1,7 +1,7 @@
-package com.tictactoe.application.usecase;
+package com.tictactoe.game.use_case;
 
-import com.tictactoe.domain.GameState;
-import com.tictactoe.domain.Position;
+import com.tictactoe.game.domain.GameState;
+import com.tictactoe.game.domain.Position;
 
 public final class MakeHumanMoveUseCase {
 

@@ -1,11 +1,11 @@
-package com.tictactoe.adapters;
+package com.tictactoe.game.adapters;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import com.tictactoe.adapters.viewmodel.BoardViewModel;
-import com.tictactoe.adapters.viewmodel.GameOutcomeKind;
-import com.tictactoe.adapters.viewmodel.StatusViewModel;
+import com.tictactoe.game.adapters.viewmodel.BoardViewModel;
+import com.tictactoe.game.adapters.viewmodel.GameOutcomeKind;
+import com.tictactoe.game.adapters.viewmodel.StatusViewModel;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

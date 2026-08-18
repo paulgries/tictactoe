@@ -1,4 +1,4 @@
-package com.tictactoe.domain;
+package com.tictactoe.game.domain;
 
 public record Position(int row, int column) {
 

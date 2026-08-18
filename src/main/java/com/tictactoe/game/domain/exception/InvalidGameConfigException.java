@@ -1,4 +1,4 @@
-package com.tictactoe.domain.exception;
+package com.tictactoe.game.domain.exception;
 
 public class InvalidGameConfigException extends RuntimeException {
 

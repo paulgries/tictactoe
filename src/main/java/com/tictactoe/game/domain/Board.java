@@ -1,6 +1,6 @@
-package com.tictactoe.domain;
+package com.tictactoe.game.domain;
 
-import com.tictactoe.domain.exception.InvalidMoveException;
+import com.tictactoe.game.domain.exception.InvalidMoveException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

@@ -1,12 +1,12 @@
-package com.tictactoe.adapters;
+package com.tictactoe.game.adapters;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.tictactoe.application.NewGameRequest;
-import com.tictactoe.domain.AiDifficulty;
-import com.tictactoe.domain.GameMode;
-import com.tictactoe.domain.exception.InvalidGameConfigException;
+import com.tictactoe.game.NewGameRequest;
+import com.tictactoe.game.domain.AiDifficulty;
+import com.tictactoe.game.domain.GameMode;
+import com.tictactoe.game.domain.exception.InvalidGameConfigException;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 

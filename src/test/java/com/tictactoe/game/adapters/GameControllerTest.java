@@ -1,4 +1,4 @@
-package com.tictactoe.adapters;
+package com.tictactoe.game.adapters;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -8,15 +8,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import com.tictactoe.adapters.viewmodel.BoardViewModel;
-import com.tictactoe.adapters.viewmodel.CellSymbol;
-import com.tictactoe.adapters.viewmodel.GameOutcomeKind;
-import com.tictactoe.adapters.viewmodel.StatusViewModel;
-import com.tictactoe.application.NewGameRequest;
-import com.tictactoe.domain.AiDifficulty;
-import com.tictactoe.domain.GameConfig;
-import com.tictactoe.domain.GameMode;
-import com.tictactoe.domain.Position;
+import com.tictactoe.game.adapters.viewmodel.BoardViewModel;
+import com.tictactoe.game.adapters.viewmodel.CellSymbol;
+import com.tictactoe.game.adapters.viewmodel.GameOutcomeKind;
+import com.tictactoe.game.adapters.viewmodel.StatusViewModel;
+import com.tictactoe.game.NewGameRequest;
+import com.tictactoe.game.domain.AiDifficulty;
+import com.tictactoe.game.domain.GameConfig;
+import com.tictactoe.game.domain.GameMode;
+import com.tictactoe.game.domain.Position;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

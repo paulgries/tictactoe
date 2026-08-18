@@ -1,9 +1,9 @@
-package com.tictactoe.adapters;
+package com.tictactoe.game.adapters;
 
-import com.tictactoe.application.NewGameRequest;
-import com.tictactoe.domain.AiDifficulty;
-import com.tictactoe.domain.GameConfig;
-import com.tictactoe.domain.GameMode;
+import com.tictactoe.game.NewGameRequest;
+import com.tictactoe.game.domain.AiDifficulty;
+import com.tictactoe.game.domain.GameConfig;
+import com.tictactoe.game.domain.GameMode;
 import java.util.Optional;
 
 public final class NewGameRequestFactory {

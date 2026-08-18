@@ -1,14 +1,14 @@
-package com.tictactoe.domain.ai;
+package com.tictactoe.game.ai;
 
-import com.tictactoe.domain.Board;
-import com.tictactoe.domain.Draw;
-import com.tictactoe.domain.GameConfig;
-import com.tictactoe.domain.GameStatus;
-import com.tictactoe.domain.Mark;
-import com.tictactoe.domain.Position;
-import com.tictactoe.domain.Win;
-import com.tictactoe.domain.WinChecker;
-import com.tictactoe.domain.exception.InvalidMoveException;
+import com.tictactoe.game.domain.Board;
+import com.tictactoe.game.domain.Draw;
+import com.tictactoe.game.domain.GameConfig;
+import com.tictactoe.game.domain.GameStatus;
+import com.tictactoe.game.domain.Mark;
+import com.tictactoe.game.domain.Position;
+import com.tictactoe.game.domain.Win;
+import com.tictactoe.game.domain.WinChecker;
+import com.tictactoe.game.domain.exception.InvalidMoveException;
 import java.util.List;
 
 public final class MinimaxAiStrategy implements AiStrategy {

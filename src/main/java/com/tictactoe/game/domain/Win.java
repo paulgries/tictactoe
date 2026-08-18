@@ -1,4 +1,4 @@
-package com.tictactoe.domain;
+package com.tictactoe.game.domain;
 
 import java.util.List;
 

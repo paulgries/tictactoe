@@ -1,13 +1,13 @@
-package com.tictactoe.application.usecase;
+package com.tictactoe.game.use_case;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tictactoe.application.NewGameRequest;
-import com.tictactoe.domain.GameConfig;
-import com.tictactoe.domain.GameMode;
-import com.tictactoe.domain.GameState;
-import com.tictactoe.domain.InProgress;
-import com.tictactoe.domain.Mark;
+import com.tictactoe.game.NewGameRequest;
+import com.tictactoe.game.domain.GameConfig;
+import com.tictactoe.game.domain.GameMode;
+import com.tictactoe.game.domain.GameState;
+import com.tictactoe.game.domain.InProgress;
+import com.tictactoe.game.domain.Mark;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 

@@ -1,9 +1,9 @@
-package com.tictactoe.infra.ui;
+package com.tictactoe.framework.ui;
 
-import com.tictactoe.adapters.GameController;
-import com.tictactoe.adapters.GameView;
-import com.tictactoe.adapters.viewmodel.BoardViewModel;
-import com.tictactoe.adapters.viewmodel.StatusViewModel;
+import com.tictactoe.game.adapters.GameController;
+import com.tictactoe.game.adapters.GameView;
+import com.tictactoe.game.adapters.viewmodel.BoardViewModel;
+import com.tictactoe.game.adapters.viewmodel.StatusViewModel;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import javax.swing.BorderFactory;

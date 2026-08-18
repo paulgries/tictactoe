@@ -1,4 +1,4 @@
-package com.tictactoe.infra.ui;
+package com.tictactoe.framework.ui;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;

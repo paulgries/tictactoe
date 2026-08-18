@@ -1,4 +1,4 @@
-package com.tictactoe.adapters;
+package com.tictactoe.game.adapters;
 
 /**
  * Lets the controller run long computations (e.g. an AI move search) without blocking

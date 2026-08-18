@@ -1,12 +1,12 @@
-package com.tictactoe.infra;
+package com.tictactoe.framework;
 
-import com.tictactoe.adapters.GameController;
-import com.tictactoe.adapters.GameControllerBuilder;
-import com.tictactoe.adapters.GameView;
-import com.tictactoe.adapters.WinEffectGameView;
-import com.tictactoe.infra.ui.EffectOverlayPanel;
-import com.tictactoe.infra.ui.MainFrame;
-import com.tictactoe.infra.ui.SwingUiScheduler;
+import com.tictactoe.game.adapters.GameController;
+import com.tictactoe.game.adapters.GameControllerBuilder;
+import com.tictactoe.game.adapters.GameView;
+import com.tictactoe.game.adapters.WinEffectGameView;
+import com.tictactoe.framework.ui.EffectOverlayPanel;
+import com.tictactoe.framework.ui.MainFrame;
+import com.tictactoe.framework.ui.SwingUiScheduler;
 import java.util.function.BooleanSupplier;
 import javax.swing.SwingUtilities;
 

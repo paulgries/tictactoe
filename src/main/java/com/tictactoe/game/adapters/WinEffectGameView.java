@@ -1,7 +1,7 @@
-package com.tictactoe.adapters;
+package com.tictactoe.game.adapters;
 
-import com.tictactoe.adapters.viewmodel.GameOutcomeKind;
-import com.tictactoe.adapters.viewmodel.StatusViewModel;
+import com.tictactoe.game.adapters.viewmodel.GameOutcomeKind;
+import com.tictactoe.game.adapters.viewmodel.StatusViewModel;
 
 /**
  * Decorates a GameView with a side effect that fires whenever the status becomes a win.

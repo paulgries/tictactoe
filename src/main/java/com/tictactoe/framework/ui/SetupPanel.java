@@ -1,10 +1,10 @@
-package com.tictactoe.infra.ui;
+package com.tictactoe.framework.ui;
 
-import com.tictactoe.adapters.GameController;
-import com.tictactoe.adapters.NewGameRequestFactory;
-import com.tictactoe.domain.AiDifficulty;
-import com.tictactoe.domain.GameMode;
-import com.tictactoe.domain.exception.InvalidGameConfigException;
+import com.tictactoe.game.adapters.GameController;
+import com.tictactoe.game.adapters.NewGameRequestFactory;
+import com.tictactoe.game.domain.AiDifficulty;
+import com.tictactoe.game.domain.GameMode;
+import com.tictactoe.game.domain.exception.InvalidGameConfigException;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.util.ArrayList;

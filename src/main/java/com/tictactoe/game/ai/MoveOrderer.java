@@ -1,7 +1,7 @@
-package com.tictactoe.domain.ai;
+package com.tictactoe.game.ai;
 
-import com.tictactoe.domain.Board;
-import com.tictactoe.domain.Position;
+import com.tictactoe.game.domain.Board;
+import com.tictactoe.game.domain.Position;
 import java.util.ArrayList;
 import java.util.List;
 

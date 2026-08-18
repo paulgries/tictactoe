@@ -1,4 +1,4 @@
-package com.tictactoe.adapters;
+package com.tictactoe.game.adapters;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -6,12 +6,12 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import com.tictactoe.adapters.viewmodel.BoardViewModel;
-import com.tictactoe.adapters.viewmodel.CellSymbol;
-import com.tictactoe.application.NewGameRequest;
-import com.tictactoe.domain.GameConfig;
-import com.tictactoe.domain.GameMode;
-import com.tictactoe.domain.Position;
+import com.tictactoe.game.adapters.viewmodel.BoardViewModel;
+import com.tictactoe.game.adapters.viewmodel.CellSymbol;
+import com.tictactoe.game.NewGameRequest;
+import com.tictactoe.game.domain.GameConfig;
+import com.tictactoe.game.domain.GameMode;
+import com.tictactoe.game.domain.Position;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;

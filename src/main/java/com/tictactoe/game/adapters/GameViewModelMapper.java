@@ -1,15 +1,15 @@
-package com.tictactoe.adapters;
+package com.tictactoe.game.adapters;
 
-import com.tictactoe.adapters.viewmodel.BoardViewModel;
-import com.tictactoe.adapters.viewmodel.CellSymbol;
-import com.tictactoe.adapters.viewmodel.CellViewModel;
-import com.tictactoe.adapters.viewmodel.GameOutcomeKind;
-import com.tictactoe.adapters.viewmodel.StatusViewModel;
-import com.tictactoe.domain.Draw;
-import com.tictactoe.domain.GameState;
-import com.tictactoe.domain.Mark;
-import com.tictactoe.domain.Position;
-import com.tictactoe.domain.Win;
+import com.tictactoe.game.adapters.viewmodel.BoardViewModel;
+import com.tictactoe.game.adapters.viewmodel.CellSymbol;
+import com.tictactoe.game.adapters.viewmodel.CellViewModel;
+import com.tictactoe.game.adapters.viewmodel.GameOutcomeKind;
+import com.tictactoe.game.adapters.viewmodel.StatusViewModel;
+import com.tictactoe.game.domain.Draw;
+import com.tictactoe.game.domain.GameState;
+import com.tictactoe.game.domain.Mark;
+import com.tictactoe.game.domain.Position;
+import com.tictactoe.game.domain.Win;
 import java.util.ArrayList;
 import java.util.List;
 
