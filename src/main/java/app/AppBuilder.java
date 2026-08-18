@@ -2,6 +2,8 @@ package app;
 
 import game.GameViewModel;
 import game.ai.AiStrategyFactory;
+import game.domain.CommonGameStateFactory;
+import game.domain.GameStateFactory;
 import game.make_human_move.MakeHumanMoveController;
 import game.make_human_move.MakeHumanMovePresenter;
 import game.make_human_move.use_case.MakeHumanMoveInteractor;
@@ -26,6 +28,8 @@ public class AppBuilder {
 
     private final GameViewModel gameViewModel = new GameViewModel();
     private final SwingUiScheduler uiScheduler = new SwingUiScheduler();
+    private final GameStateFactory gameStateFactory = new CommonGameStateFactory();
+    private final AiStrategyFactory aiStrategyFactory = new AiStrategyFactory();
 
     private MainFrame frame;
     private RequestAiMoveController requestAiMoveController;
@@ -64,8 +68,8 @@ public class AppBuilder {
         final StartNewGamePresenter startNewGamePresenter =
                 new StartNewGamePresenter(gameViewModel);
         final StartNewGameController startNewGameController = new StartNewGameController(
-                new StartNewGameInteractor(startNewGamePresenter),
-                new AiStrategyFactory(), gameViewModel);
+                new StartNewGameInteractor(
+                        startNewGamePresenter, gameStateFactory, aiStrategyFactory));
         frame.setStartNewGameController(startNewGameController);
         return this;
     }

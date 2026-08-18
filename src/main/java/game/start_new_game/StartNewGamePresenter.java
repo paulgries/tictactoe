@@ -7,8 +7,9 @@ import game.start_new_game.use_case.StartNewGameOutputBoundary;
 import game.start_new_game.use_case.StartNewGameOutputData;
 
 /**
- * The Presenter for the Start New Game Use Case. Updates the shared game
- * view model and fires a property change so the view re-renders.
+ * The Presenter for the Start New Game Use Case. Stashes the session data
+ * (mode and AI strategy) in the shared bean, updates the render state, and
+ * fires a property change so the view re-renders.
  */
 public class StartNewGamePresenter implements StartNewGameOutputBoundary {
 
@@ -22,6 +23,8 @@ public class StartNewGamePresenter implements StartNewGameOutputBoundary {
     public void prepareSuccessView(StartNewGameOutputData outputData) {
         final GameState state = gameViewModel.getState();
         state.setCurrentGameState(outputData.gameState());
+        state.setMode(outputData.mode());
+        state.setAiStrategy(outputData.aiStrategy());
         state.setBoard(GameViewModelMapper.toBoardViewModel(outputData.gameState()));
         state.setStatus(GameViewModelMapper.toStatusViewModel(outputData.gameState()));
         state.setError(null);

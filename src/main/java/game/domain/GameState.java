@@ -9,7 +9,8 @@ public record GameState(Board board, Mark currentTurn, GameConfig config, GameSt
     public static final Mark STARTING_MARK = Mark.X;
 
     public static GameState newGame(GameConfig config) {
-        return GameStateFactory.newGame(config);
+        return new GameState(
+            new Board(config.boardSize()), STARTING_MARK, config, new InProgress());
     }
 
     public boolean isGameOver() {
