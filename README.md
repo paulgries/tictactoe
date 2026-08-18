@@ -1,17 +1,23 @@
 # Tic-Tac-Toe
 
-A desktop Tic-Tac-Toe game (see the `TicTacToe/` folder), built in Java with a
-Swing UI. Play two-player locally or against a computer opponent on a
-configurable board, from the classic 3x3 up to a 10x10 board with a longer
-line needed to win.
+A desktop Tic-Tac-Toe game, built in Java with a Swing UI. Play two-player
+locally or against a computer opponent on a configurable board, from the
+classic 3x3 up to a 10x10 board with a longer line needed to win.
 
-This was developed by Lindsey Shorser with Claude Code on August 12-13, 2026. For a description of the design patterns that were included, see `TicTacToe/DesignPattersn.md`.
+This was developed by Lindsey Shorser with Claude Code on August 12-13, 2026. For a description of the design patterns that were included, see `DesignPatterns.md`.
 
 ## Running it
 
 ```
-cd TicTacToe
 ./run.sh
+```
+
+## Building & testing
+
+Requires Maven and Java 17+. Run the test suite with:
+
+```
+mvn clean test
 ```
 
 ## Choosable options
