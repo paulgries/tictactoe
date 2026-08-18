@@ -49,8 +49,9 @@ repo-specific details) to carry the workflow forward.
   **Controller**, which builds the `InputData` from view primitives.
 - View-state model: a `framework/ViewModel<T>` base plus a view model
   holding two separate states — a `SessionState` (current domain state,
-  mode, AI strategy) that controllers and presenters share across use cases,
-  and a `GameRenderState` (board/status/error) that the frame renders from.
+  mode, AI difficulty) that controllers and presenters share across use
+  cases, and a `GameRenderState` (board/status/error) that the frame renders
+  from.
   Presenters update both and fire one property change; one `MainFrame`
   renders from it. Presentation-side rules shared by several use cases (e.g.
   "is the AI to move?") live in a small static helper (`GameSessionRules`),

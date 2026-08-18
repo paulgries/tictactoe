@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import game.ai.AiStrategyFactory;
 import game.domain.AiDifficulty;
 import game.domain.CommonGameStateFactory;
 import game.domain.GameConfig;
@@ -30,8 +29,7 @@ class StartNewGameInteractorTest {
 
     @BeforeEach
     void setUp() {
-        interactor = new StartNewGameInteractor(
-                presenter, new CommonGameStateFactory(), new AiStrategyFactory());
+        interactor = new StartNewGameInteractor(presenter, new CommonGameStateFactory());
     }
 
     @Test
@@ -50,12 +48,12 @@ class StartNewGameInteractorTest {
         assertThat(captor.getValue().gameState().currentTurn()).isEqualTo(Mark.X);
         assertThat(captor.getValue().gameState().status()).isInstanceOf(InProgress.class);
         assertThat(captor.getValue().mode()).isEqualTo(GameMode.TWO_PLAYER);
-        assertThat(captor.getValue().aiStrategy()).isEmpty();
+        assertThat(captor.getValue().difficulty()).isEmpty();
         verify(presenter, never()).prepareFailView(any());
     }
 
     @Test
-    void execute_AiMode_CreatesStrategyFromDifficulty() {
+    void execute_AiMode_CarriesDifficulty() {
         StartNewGameInputData inputData = new StartNewGameInputData(
                 3, 3, GameMode.HUMAN_VS_AI, Optional.of(AiDifficulty.EASY));
 
@@ -65,7 +63,7 @@ class StartNewGameInteractorTest {
             ArgumentCaptor.forClass(StartNewGameOutputData.class);
         verify(presenter).prepareSuccessView(captor.capture());
         assertThat(captor.getValue().mode()).isEqualTo(GameMode.HUMAN_VS_AI);
-        assertThat(captor.getValue().aiStrategy()).isPresent();
+        assertThat(captor.getValue().difficulty()).contains(AiDifficulty.EASY);
     }
 
     @Test

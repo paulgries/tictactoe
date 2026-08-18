@@ -2,7 +2,7 @@ package game.request_ai_move;
 
 import game.GameViewModel;
 import game.SessionState;
-import game.ai.AiStrategy;
+import game.domain.AiDifficulty;
 import game.request_ai_move.use_case.RequestAiMoveInputBoundary;
 import game.request_ai_move.use_case.RequestAiMoveInputData;
 import framework.UiScheduler;
@@ -31,11 +31,11 @@ public class RequestAiMoveController {
     public void execute() {
         final SessionState session = gameViewModel.getSession();
         final game.domain.GameState base = session.getCurrentGameState();
-        final AiStrategy strategy = session.getAiStrategy()
-            .orElseThrow(() -> new NullPointerException("no AI strategy is active"));
+        final AiDifficulty difficulty = session.getDifficulty()
+            .orElseThrow(() -> new NullPointerException("no AI difficulty is set"));
 
         uiScheduler.runInBackground(() -> {
-            requestAiMoveUseCase.execute(new RequestAiMoveInputData(base, strategy));
+            requestAiMoveUseCase.execute(new RequestAiMoveInputData(base, difficulty));
         });
     }
 }

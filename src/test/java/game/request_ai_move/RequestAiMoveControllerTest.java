@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 
 import game.GameViewModel;
-import game.ai.AiStrategy;
+import game.domain.AiDifficulty;
 import game.domain.GameConfig;
 import game.domain.GameState;
 import game.domain.Position;
@@ -25,13 +25,6 @@ class RequestAiMoveControllerTest {
 
     private static final GameConfig CONFIG_3X3 = new GameConfig(3, 3);
 
-    private final AiStrategy fixedMoveStrategy = new AiStrategy() {
-        @Override
-        public Position selectMove(game.domain.Board board, GameConfig config, game.domain.Mark aiMark) {
-            return new Position(1, 1);
-        }
-    };
-
     @Mock
     private RequestAiMoveInputBoundary requestAiMoveUseCase;
 
@@ -47,11 +40,11 @@ class RequestAiMoveControllerTest {
     }
 
     @Test
-    void execute_RunsInteractorInBackgroundWithSnapshotAndStrategy() {
+    void execute_RunsInteractorInBackgroundWithSnapshotAndDifficulty() {
         game.domain.GameState current = game.domain.GameState.newGame(CONFIG_3X3);
         game.domain.GameState base = current.applyMove(new Position(0, 0));
         gameViewModel.getSession().setCurrentGameState(base);
-        gameViewModel.getSession().setAiStrategy(Optional.of(fixedMoveStrategy));
+        gameViewModel.getSession().setDifficulty(Optional.of(AiDifficulty.EASY));
 
         controller.execute();
 
@@ -63,11 +56,11 @@ class RequestAiMoveControllerTest {
             ArgumentCaptor.forClass(RequestAiMoveInputData.class);
         verify(requestAiMoveUseCase).execute(captor.capture());
         assertThat(captor.getValue().state()).isEqualTo(base);
-        assertThat(captor.getValue().strategy()).isEqualTo(fixedMoveStrategy);
+        assertThat(captor.getValue().difficulty()).isEqualTo(AiDifficulty.EASY);
     }
 
     @Test
-    void execute_NoStrategy_Throws() {
+    void execute_NoDifficulty_Throws() {
         game.domain.GameState current = game.domain.GameState.newGame(CONFIG_3X3);
         gameViewModel.getSession().setCurrentGameState(current);
 

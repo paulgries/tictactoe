@@ -10,8 +10,8 @@ import game.start_new_game.use_case.StartNewGameOutputData;
 
 /**
  * The Presenter for the Start New Game Use Case. Stashes the session data
- * (mode and AI strategy) in the shared bean, updates the render state, and
- * fires a property change so the view re-renders. Navigation is
+ * (mode and AI difficulty) in the shared view model, updates the render
+ * state, and fires a property change so the view re-renders. Navigation is
  * presenter-driven through the {@link ViewManagerModel}, as in
  * CAWithBuilder.
  */
@@ -35,7 +35,7 @@ public class StartNewGamePresenter implements StartNewGameOutputBoundary {
         final SessionState session = gameViewModel.getSession();
         session.setCurrentGameState(outputData.gameState());
         session.setMode(outputData.mode());
-        session.setAiStrategy(outputData.aiStrategy());
+        session.setDifficulty(outputData.difficulty());
         final GameRenderState render = gameViewModel.getState();
         render.setBoard(GameViewModelMapper.toBoardViewModel(outputData.gameState()));
         render.setStatus(GameViewModelMapper.toStatusViewModel(outputData.gameState()));

@@ -1,6 +1,6 @@
 package game;
 
-import game.ai.AiStrategy;
+import game.domain.AiDifficulty;
 import game.domain.GameMode;
 import java.util.Optional;
 
@@ -14,7 +14,7 @@ public class SessionState {
 
     private game.domain.GameState currentGameState;
     private GameMode mode;
-    private Optional<AiStrategy> aiStrategy = Optional.empty();
+    private Optional<AiDifficulty> difficulty = Optional.empty();
 
     public game.domain.GameState getCurrentGameState() {
         return currentGameState;
@@ -32,11 +32,11 @@ public class SessionState {
         this.mode = mode;
     }
 
-    public Optional<AiStrategy> getAiStrategy() {
-        return aiStrategy;
+    public Optional<AiDifficulty> getDifficulty() {
+        return difficulty;
     }
 
-    public void setAiStrategy(Optional<AiStrategy> aiStrategy) {
-        this.aiStrategy = aiStrategy;
+    public void setDifficulty(Optional<AiDifficulty> difficulty) {
+        this.difficulty = difficulty;
     }
 }

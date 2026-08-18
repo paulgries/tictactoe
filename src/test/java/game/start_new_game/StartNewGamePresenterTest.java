@@ -6,7 +6,7 @@ import framework.ViewManagerModel;
 import game.CellSymbol;
 import game.GameRenderState;
 import game.GameViewModel;
-import game.ai.EasyAiStrategy;
+import game.domain.AiDifficulty;
 import game.domain.GameConfig;
 import game.domain.GameMode;
 import game.start_new_game.use_case.StartNewGameOutputData;
@@ -45,7 +45,7 @@ class StartNewGamePresenterTest {
 
         assertThat(gameViewModel.getSession().getCurrentGameState()).isEqualTo(fresh);
         assertThat(gameViewModel.getSession().getMode()).isEqualTo(GameMode.TWO_PLAYER);
-        assertThat(gameViewModel.getSession().getAiStrategy()).isEmpty();
+        assertThat(gameViewModel.getSession().getDifficulty()).isEmpty();
         GameRenderState render = gameViewModel.getState();
         assertThat(render.getBoard().cells()).hasSize(9);
         assertThat(render.getBoard().cells().get(0).symbol()).isEqualTo(CellSymbol.EMPTY);
@@ -56,14 +56,14 @@ class StartNewGamePresenterTest {
     }
 
     @Test
-    void prepareSuccessView_AiMode_StashesStrategy() {
+    void prepareSuccessView_AiMode_StashesDifficulty() {
         game.domain.GameState fresh = game.domain.GameState.newGame(new GameConfig(3, 3));
 
         presenter.prepareSuccessView(new StartNewGameOutputData(
-                fresh, GameMode.HUMAN_VS_AI, Optional.of(new EasyAiStrategy())));
+                fresh, GameMode.HUMAN_VS_AI, Optional.of(AiDifficulty.EASY)));
 
         assertThat(gameViewModel.getSession().getMode()).isEqualTo(GameMode.HUMAN_VS_AI);
-        assertThat(gameViewModel.getSession().getAiStrategy()).isPresent();
+        assertThat(gameViewModel.getSession().getDifficulty()).contains(AiDifficulty.EASY);
     }
 
     @Test

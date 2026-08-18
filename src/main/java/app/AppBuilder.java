@@ -58,7 +58,8 @@ public class AppBuilder {
         final RequestAiMovePresenter requestAiMovePresenter =
                 new RequestAiMovePresenter(gameViewModel, uiScheduler);
         requestAiMoveController = new RequestAiMoveController(
-                new RequestAiMoveInteractor(requestAiMovePresenter), gameViewModel, uiScheduler);
+                new RequestAiMoveInteractor(requestAiMovePresenter, aiStrategyFactory),
+                gameViewModel, uiScheduler);
         return this;
     }
 
@@ -79,8 +80,7 @@ public class AppBuilder {
         final StartNewGamePresenter startNewGamePresenter = new StartNewGamePresenter(
                 gameViewModel, viewManagerModel, SetupPanel.VIEW_NAME);
         final StartNewGameController startNewGameController = new StartNewGameController(
-                new StartNewGameInteractor(
-                        startNewGamePresenter, gameStateFactory, aiStrategyFactory));
+                new StartNewGameInteractor(startNewGamePresenter, gameStateFactory));
         frame.setStartNewGameController(startNewGameController);
         return this;
     }

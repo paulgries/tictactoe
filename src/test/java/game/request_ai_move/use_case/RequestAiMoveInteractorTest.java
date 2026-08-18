@@ -4,10 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import game.ai.AiStrategy;
-import game.domain.Board;
+import game.ai.AiStrategyFactory;
+import game.domain.AiDifficulty;
 import game.domain.GameConfig;
 import game.domain.GameState;
 import game.domain.Mark;
@@ -26,41 +25,34 @@ class RequestAiMoveInteractorTest {
     @Mock
     private RequestAiMoveOutputBoundary presenter;
 
-    @Mock
-    private AiStrategy strategy;
-
     private RequestAiMoveInteractor interactor;
 
     @BeforeEach
     void setUp() {
-        interactor = new RequestAiMoveInteractor(presenter);
+        interactor = new RequestAiMoveInteractor(presenter, new AiStrategyFactory());
     }
 
     @Test
     void execute_GameAlreadyOver_PresentsFailViewWithoutConsultingStrategy() {
         GameState state = GameFixtures.wonByX();
 
-        interactor.execute(new RequestAiMoveInputData(state, strategy));
+        interactor.execute(new RequestAiMoveInputData(state, AiDifficulty.EASY));
 
         verify(presenter).prepareFailView("cannot request an AI move after the game is over");
         verify(presenter, never()).prepareSuccessView(any());
-        verify(strategy, never()).selectMove(any(Board.class), any(GameConfig.class), any(Mark.class));
     }
 
     @Test
-    void execute_ValidMove_PresentsUpdatedStateEchoingTheBase() {
+    void execute_ValidMove_BuildsStrategyFromDifficultyAndPresentsUpdatedStateEchoingTheBase() {
         GameState base = GameState.newGame(new GameConfig(3, 3)).applyMove(new Position(0, 0));
-        when(strategy.selectMove(base.board(), base.config(), base.currentTurn()))
-            .thenReturn(new Position(1, 1));
 
-        interactor.execute(new RequestAiMoveInputData(base, strategy));
+        interactor.execute(new RequestAiMoveInputData(base, AiDifficulty.MEDIUM));
 
         ArgumentCaptor<RequestAiMoveOutputData> captor =
             ArgumentCaptor.forClass(RequestAiMoveOutputData.class);
         verify(presenter).prepareSuccessView(captor.capture());
-        assertThat(captor.getValue().updatedState().board().get(new Position(1, 1)))
-            .contains(Mark.O);
         assertThat(captor.getValue().updatedState().currentTurn()).isEqualTo(Mark.X);
+        assertThat(captor.getValue().updatedState().board().emptyPositions()).hasSize(7);
         assertThat(captor.getValue().base()).isSameAs(base);
     }
 }
