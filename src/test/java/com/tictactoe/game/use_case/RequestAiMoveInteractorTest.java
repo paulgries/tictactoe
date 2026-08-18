@@ -11,6 +11,7 @@ import com.tictactoe.game.domain.GameConfig;
 import com.tictactoe.game.domain.GameState;
 import com.tictactoe.game.domain.Mark;
 import com.tictactoe.game.domain.Position;
+import com.tictactoe.game.testutil.GameFixtures;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,12 +57,7 @@ class RequestAiMoveInteractorTest {
 
     @Test
     void execute_GameAlreadyOver_PresentsFailView() {
-        GameState state = GameState.newGame(CONFIG_3X3)
-            .applyMove(new Position(0, 0)) // X
-            .applyMove(new Position(1, 0)) // O
-            .applyMove(new Position(0, 1)) // X
-            .applyMove(new Position(1, 1)) // O
-            .applyMove(new Position(0, 2)); // X wins
+        GameState state = GameFixtures.wonByX();
 
         interactor.execute(new RequestAiMoveInputData(state, fixedMoveStrategy));
 

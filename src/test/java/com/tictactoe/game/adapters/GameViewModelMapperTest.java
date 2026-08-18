@@ -9,6 +9,7 @@ import com.tictactoe.game.adapters.viewmodel.StatusViewModel;
 import com.tictactoe.game.domain.GameConfig;
 import com.tictactoe.game.domain.GameState;
 import com.tictactoe.game.domain.Position;
+import com.tictactoe.game.testutil.GameFixtures;
 import org.junit.jupiter.api.Test;
 
 class GameViewModelMapperTest {
@@ -30,12 +31,7 @@ class GameViewModelMapperTest {
 
     @Test
     void toBoardViewModelIncludesWinningLineAndWinOutcomeWhenWon() {
-        GameState state = GameState.newGame(CONFIG_3X3)
-            .applyMove(new Position(0, 0)) // X
-            .applyMove(new Position(1, 0)) // O
-            .applyMove(new Position(0, 1)) // X
-            .applyMove(new Position(1, 1)) // O
-            .applyMove(new Position(0, 2)); // X wins top row
+        GameState state = GameFixtures.wonByX();
 
         BoardViewModel board = GameViewModelMapper.toBoardViewModel(state);
 
@@ -46,19 +42,7 @@ class GameViewModelMapperTest {
 
     @Test
     void toBoardViewModelHasDrawOutcomeAndNoWinningLineWhenDrawn() {
-        // X O X
-        // X X O
-        // O X O
-        GameState state = GameState.newGame(CONFIG_3X3)
-            .applyMove(new Position(0, 0)) // X
-            .applyMove(new Position(0, 1)) // O
-            .applyMove(new Position(0, 2)) // X
-            .applyMove(new Position(1, 2)) // O
-            .applyMove(new Position(1, 0)) // X
-            .applyMove(new Position(2, 0)) // O
-            .applyMove(new Position(1, 1)) // X
-            .applyMove(new Position(2, 2)) // O
-            .applyMove(new Position(2, 1)); // X
+        GameState state = GameFixtures.drawn();
 
         BoardViewModel board = GameViewModelMapper.toBoardViewModel(state);
 
@@ -78,12 +62,7 @@ class GameViewModelMapperTest {
 
     @Test
     void toStatusViewModelReflectsWinnerWhenWon() {
-        GameState state = GameState.newGame(CONFIG_3X3)
-            .applyMove(new Position(0, 0)) // X
-            .applyMove(new Position(1, 0)) // O
-            .applyMove(new Position(0, 1)) // X
-            .applyMove(new Position(1, 1)) // O
-            .applyMove(new Position(0, 2)); // X wins
+        GameState state = GameFixtures.wonByX();
 
         StatusViewModel status = GameViewModelMapper.toStatusViewModel(state);
 

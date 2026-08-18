@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Optional;
+import com.tictactoe.game.testutil.GameFixtures;
 import org.junit.jupiter.api.Test;
 
 class WinCheckerTest {
@@ -86,19 +87,7 @@ class WinCheckerTest {
 
     @Test
     void evaluateReturnsDrawWhenBoardFullWithNoWinner() {
-        // X O X
-        // X X O
-        // O X O
-        Board board = new Board(3)
-            .placeMark(new Position(0, 0), Mark.X)
-            .placeMark(new Position(0, 1), Mark.O)
-            .placeMark(new Position(0, 2), Mark.X)
-            .placeMark(new Position(1, 0), Mark.X)
-            .placeMark(new Position(1, 1), Mark.X)
-            .placeMark(new Position(1, 2), Mark.O)
-            .placeMark(new Position(2, 0), Mark.O)
-            .placeMark(new Position(2, 1), Mark.X)
-            .placeMark(new Position(2, 2), Mark.O);
+        Board board = GameFixtures.drawnBoard();
 
         assertThat(WinChecker.evaluate(board, CONFIG_3X3)).isInstanceOf(Draw.class);
     }

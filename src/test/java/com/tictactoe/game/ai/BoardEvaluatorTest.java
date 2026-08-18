@@ -6,6 +6,7 @@ import com.tictactoe.game.domain.Board;
 import com.tictactoe.game.domain.GameConfig;
 import com.tictactoe.game.domain.Mark;
 import com.tictactoe.game.domain.Position;
+import com.tictactoe.game.testutil.GameFixtures;
 import org.junit.jupiter.api.Test;
 
 class BoardEvaluatorTest {
@@ -14,10 +15,7 @@ class BoardEvaluatorTest {
 
     @Test
     void scoresWinForMaximizingPlayerPositively() {
-        Board board = new Board(3)
-            .placeMark(new Position(0, 0), Mark.X)
-            .placeMark(new Position(0, 1), Mark.X)
-            .placeMark(new Position(0, 2), Mark.X);
+        Board board = GameFixtures.wonByXBoard();
 
         long score = BoardEvaluator.score(board, CONFIG_3X3, Mark.X);
 
@@ -26,10 +24,7 @@ class BoardEvaluatorTest {
 
     @Test
     void scoresWinForOpponentNegatively() {
-        Board board = new Board(3)
-            .placeMark(new Position(0, 0), Mark.O)
-            .placeMark(new Position(0, 1), Mark.O)
-            .placeMark(new Position(0, 2), Mark.O);
+        Board board = GameFixtures.wonByOBoard();
 
         long score = BoardEvaluator.score(board, CONFIG_3X3, Mark.X);
 
@@ -38,20 +33,7 @@ class BoardEvaluatorTest {
 
     @Test
     void scoresDrawAsZero() {
-        // X O X
-        // X X O
-        // O X O
-        // every row, column and diagonal is contested (mixed marks)
-        Board board = new Board(3)
-            .placeMark(new Position(0, 0), Mark.X)
-            .placeMark(new Position(0, 1), Mark.O)
-            .placeMark(new Position(0, 2), Mark.X)
-            .placeMark(new Position(1, 0), Mark.X)
-            .placeMark(new Position(1, 1), Mark.X)
-            .placeMark(new Position(1, 2), Mark.O)
-            .placeMark(new Position(2, 0), Mark.O)
-            .placeMark(new Position(2, 1), Mark.X)
-            .placeMark(new Position(2, 2), Mark.O);
+        Board board = GameFixtures.drawnBoard();
 
         long score = BoardEvaluator.score(board, CONFIG_3X3, Mark.X);
 
