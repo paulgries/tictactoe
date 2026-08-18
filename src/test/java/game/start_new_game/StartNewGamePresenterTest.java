@@ -80,7 +80,7 @@ class StartNewGamePresenterTest {
     void prepareFailView_SetsErrorAndFires() {
         presenter.prepareFailView("boom");
 
-        assertThat(gameViewModel.getState().getError()).isEqualTo("boom");
+        assertThat(gameViewModel.getState().getMessage()).isEqualTo("boom");
         assertThat(fireCount).isEqualTo(1);
         assertThat(viewManagerModel.getState()).isEmpty();
     }

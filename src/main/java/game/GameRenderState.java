@@ -3,13 +3,13 @@ package game;
 /**
  * The render part of the game view model: everything the frame needs to
  * draw. Presenters write it; the frame only reads it (except for clearing
- * a shown error). It holds no session data and no game policy.
+ * a shown message). It holds no session data and no game policy.
  */
 public class GameRenderState {
 
     private BoardViewModel board;
     private StatusViewModel status;
-    private String error;
+    private String message;
 
     public BoardViewModel getBoard() {
         return board;
@@ -27,11 +27,11 @@ public class GameRenderState {
         this.status = status;
     }
 
-    public String getError() {
-        return error;
+    public String getMessage() {
+        return message;
     }
 
-    public void setError(String error) {
-        this.error = error;
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

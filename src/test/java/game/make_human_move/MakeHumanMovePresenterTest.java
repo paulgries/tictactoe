@@ -66,7 +66,7 @@ class MakeHumanMovePresenterTest {
     void prepareFailView_SetsErrorAndFires() {
         presenter.prepareFailView("cell already occupied: " + new Position(0, 0));
 
-        assertThat(gameViewModel.getState().getError())
+        assertThat(gameViewModel.getState().getMessage())
             .isEqualTo("cell already occupied: " + new Position(0, 0));
         assertThat(fireCount).isEqualTo(1);
         assertThat(requestAiMoveCalls).isZero();

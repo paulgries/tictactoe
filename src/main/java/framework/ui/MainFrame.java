@@ -3,7 +3,9 @@ package framework.ui;
 import game.GameOutcomeKind;
 import game.GameRenderState;
 import game.GameViewModel;
+import game.load_game.LoadGameController;
 import game.make_human_move.MakeHumanMoveController;
+import game.save_game.SaveGameController;
 import game.start_new_game.StartNewGameController;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -17,8 +19,8 @@ import javax.swing.JPanel;
 
 /**
  * The main window. Renders the board and status whenever the shared game
- * view model fires a property change, shows errors, and runs the configured
- * win effects whenever the status becomes a win.
+ * view model fires a property change, shows transient messages, and runs
+ * the configured win effects whenever the status becomes a win.
  */
 public final class MainFrame extends JFrame implements PropertyChangeListener {
 
@@ -74,6 +76,14 @@ public final class MainFrame extends JFrame implements PropertyChangeListener {
         statusPanel.setStartNewGameController(startNewGameController);
     }
 
+    public void setSaveGameController(SaveGameController saveGameController) {
+        statusPanel.setSaveGameController(saveGameController);
+    }
+
+    public void setLoadGameController(LoadGameController loadGameController) {
+        setupPanel.setLoadGameController(loadGameController);
+    }
+
     public void setMakeHumanMoveController(MakeHumanMoveController makeHumanMoveController) {
         boardPanel.setMakeHumanMoveController(makeHumanMoveController);
     }
@@ -103,11 +113,11 @@ public final class MainFrame extends JFrame implements PropertyChangeListener {
         if (state.getStatus() != null) {
             statusPanel.render(state.getStatus());
         }
-        if (state.getError() != null) {
-            String error = state.getError();
-            state.setError(null);
+        if (state.getMessage() != null) {
+            String message = state.getMessage();
+            state.setMessage(null);
             JOptionPane.showMessageDialog(
-                this, error, "Invalid Move", JOptionPane.ERROR_MESSAGE);
+                this, message, "Tic-Tac-Toe", JOptionPane.INFORMATION_MESSAGE);
         }
         if (state.getStatus() != null && state.getStatus().kind() == GameOutcomeKind.WIN) {
             winEffects.forEach(Runnable::run);

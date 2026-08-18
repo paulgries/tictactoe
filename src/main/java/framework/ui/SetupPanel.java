@@ -2,6 +2,7 @@ package framework.ui;
 
 import game.domain.AiDifficulty;
 import game.domain.GameMode;
+import game.load_game.LoadGameController;
 import game.start_new_game.StartNewGameController;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -26,6 +27,7 @@ public final class SetupPanel extends JPanel {
     private static final int START_BUTTON_OUTLINE_THICKNESS = 3;
 
     private StartNewGameController startNewGameController;
+    private LoadGameController loadGameController;
 
     private final JSpinner boardSizeSpinner = new JSpinner(new SpinnerNumberModel(3, 2, 10, 1));
     private final JSpinner winLengthSpinner = new JSpinner(new SpinnerNumberModel(3, 2, 10, 1));
@@ -37,6 +39,7 @@ public final class SetupPanel extends JPanel {
     private final JCheckBox marksCheckBox = new JCheckBox("X's & O's", true);
     private final JCheckBox nightModeCheckBox = new JCheckBox("Night Mode", Theme.mode() == Theme.Mode.NIGHT);
     private final JButton startButton = new JButton("Start Game");
+    private final JButton resumeButton = new JButton("Resume Saved Game");
     private final JPanel startButtonOutline = new JPanel(new BorderLayout());
     private final List<JLabel> labels = new ArrayList<>();
 
@@ -57,6 +60,7 @@ public final class SetupPanel extends JPanel {
             e -> Theme.setMode(nightModeCheckBox.isSelected() ? Theme.Mode.NIGHT : Theme.Mode.DAY));
 
         startButton.addActionListener(e -> onStartClicked());
+        resumeButton.addActionListener(e -> loadGameController.execute());
         startButtonOutline.setBorder(BorderFactory.createEmptyBorder(
             START_BUTTON_OUTLINE_THICKNESS, START_BUTTON_OUTLINE_THICKNESS,
             START_BUTTON_OUTLINE_THICKNESS, START_BUTTON_OUTLINE_THICKNESS));
@@ -80,6 +84,8 @@ public final class SetupPanel extends JPanel {
         add(nightModeCheckBox);
         add(label(""));
         add(startButtonOutline);
+        add(label(""));
+        add(resumeButton);
 
         Theme.addListener(this::applyTheme);
         applyTheme();
@@ -102,10 +108,15 @@ public final class SetupPanel extends JPanel {
         nightModeCheckBox.setForeground(Theme.textColor());
         startButtonOutline.setBackground(Theme.textColor());
         Theme.styleButton(startButton);
+        Theme.styleButton(resumeButton);
     }
 
     public void setStartNewGameController(StartNewGameController startNewGameController) {
         this.startNewGameController = startNewGameController;
+    }
+
+    public void setLoadGameController(LoadGameController loadGameController) {
+        this.loadGameController = loadGameController;
     }
 
     public String getViewName() {

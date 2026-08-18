@@ -39,7 +39,7 @@ public class StartNewGamePresenter implements StartNewGameOutputBoundary {
         final GameRenderState render = gameViewModel.getState();
         render.setBoard(GameViewModelMapper.toBoardViewModel(outputData.gameState()));
         render.setStatus(GameViewModelMapper.toStatusViewModel(outputData.gameState()));
-        render.setError(null);
+        render.setMessage(null);
         gameViewModel.firePropertyChanged();
 
         viewManagerModel.setState(gameViewModel.getViewName());
@@ -48,7 +48,7 @@ public class StartNewGamePresenter implements StartNewGameOutputBoundary {
 
     @Override
     public void prepareFailView(String error) {
-        gameViewModel.getState().setError(error);
+        gameViewModel.getState().setMessage(error);
         gameViewModel.firePropertyChanged();
     }
 

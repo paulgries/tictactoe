@@ -37,7 +37,9 @@ repo-specific details) to carry the workflow forward.
   - `game/start_new_game/use_case`
   - `game/make_human_move/use_case`
   - `game/request_ai_move/use_case`
-  - `game/domain/` (shared domain model)
+  - `game/save_game/use_case` (persistence boundary: `SaveGameDataAccess`)
+  - `game/load_game/use_case` (persistence boundary: `LoadGameDataAccess`)
+  - `game/domain/` (shared domain model, incl. `SavedGame` snapshot)
   - `app/`, `framework/`
 - Build a `CommonUser`/`CommonUserFactory` style entity for domain models.
 - Each use case gets a boundary set under its `use_case` package:
@@ -50,7 +52,7 @@ repo-specific details) to carry the workflow forward.
 - View-state model: a `framework/ViewModel<T>` base plus a view model
   holding two separate states — a `SessionState` (current domain state,
   mode, AI difficulty) that controllers and presenters share across use
-  cases, and a `GameRenderState` (board/status/error) that the frame renders
+  cases, and a `GameRenderState` (board/status/message) that the frame renders
   from.
   Presenters update both and fire one property change; one `MainFrame`
   renders from it. Presentation-side rules shared by several use cases (e.g.

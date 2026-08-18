@@ -14,6 +14,8 @@ public class Main {
                 .addRequestAiMoveUseCase()
                 .addMakeHumanMoveUseCase()
                 .addStartNewGameUseCase()
+                .addSaveGameUseCase()
+                .addLoadGameUseCase()
                 .build();
 
         application.pack();

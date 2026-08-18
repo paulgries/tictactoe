@@ -4,21 +4,29 @@ import game.GameViewModel;
 import game.ai.AiStrategyFactory;
 import game.domain.CommonGameStateFactory;
 import game.domain.GameStateFactory;
+import game.load_game.LoadGameController;
+import game.load_game.LoadGamePresenter;
+import game.load_game.use_case.LoadGameInteractor;
 import game.make_human_move.MakeHumanMoveController;
 import game.make_human_move.MakeHumanMovePresenter;
 import game.make_human_move.use_case.MakeHumanMoveInteractor;
 import game.request_ai_move.RequestAiMoveController;
 import game.request_ai_move.RequestAiMovePresenter;
 import game.request_ai_move.use_case.RequestAiMoveInteractor;
+import game.save_game.SaveGameController;
+import game.save_game.SaveGamePresenter;
+import game.save_game.use_case.SaveGameInteractor;
 import game.start_new_game.StartNewGameController;
 import game.start_new_game.StartNewGamePresenter;
 import game.start_new_game.use_case.StartNewGameInteractor;
 import framework.ViewManager;
 import framework.ViewManagerModel;
+import framework.storage.FileGameStore;
 import framework.ui.EffectOverlayPanel;
 import framework.ui.MainFrame;
 import framework.ui.SetupPanel;
 import framework.ui.SwingUiScheduler;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import javax.swing.JFrame;
@@ -34,6 +42,8 @@ public class AppBuilder {
     private final GameStateFactory gameStateFactory = new CommonGameStateFactory();
     private final AiStrategyFactory aiStrategyFactory = new AiStrategyFactory();
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
+    private final FileGameStore fileGameStore = new FileGameStore(
+            Path.of(System.getProperty("user.home"), ".tictactoe", "saved-game.txt"));
 
     private MainFrame frame;
     private ViewManager viewManager;
@@ -82,6 +92,23 @@ public class AppBuilder {
         final StartNewGameController startNewGameController = new StartNewGameController(
                 new StartNewGameInteractor(startNewGamePresenter, gameStateFactory));
         frame.setStartNewGameController(startNewGameController);
+        return this;
+    }
+
+    public AppBuilder addSaveGameUseCase() {
+        final SaveGamePresenter saveGamePresenter = new SaveGamePresenter(gameViewModel);
+        final SaveGameController saveGameController = new SaveGameController(
+                new SaveGameInteractor(saveGamePresenter, fileGameStore), gameViewModel);
+        frame.setSaveGameController(saveGameController);
+        return this;
+    }
+
+    public AppBuilder addLoadGameUseCase() {
+        final LoadGamePresenter loadGamePresenter =
+                new LoadGamePresenter(gameViewModel, viewManagerModel);
+        final LoadGameController loadGameController = new LoadGameController(
+                new LoadGameInteractor(loadGamePresenter, fileGameStore));
+        frame.setLoadGameController(loadGameController);
         return this;
     }
 

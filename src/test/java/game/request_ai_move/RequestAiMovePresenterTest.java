@@ -72,11 +72,11 @@ class RequestAiMovePresenterTest {
     void prepareFailView_SetsErrorOnUiThread() {
         presenter.prepareFailView("cannot request an AI move after the game is over");
 
-        assertThat(gameViewModel.getState().getError()).isNull();
+        assertThat(gameViewModel.getState().getMessage()).isNull();
 
         scheduler.runNextUiTask();
 
-        assertThat(gameViewModel.getState().getError())
+        assertThat(gameViewModel.getState().getMessage())
             .isEqualTo("cannot request an AI move after the game is over");
         assertThat(fireCount).isEqualTo(1);
     }

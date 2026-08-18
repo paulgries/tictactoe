@@ -34,7 +34,7 @@ public class RequestAiMovePresenter implements RequestAiMoveOutputBoundary {
                 final GameRenderState render = gameViewModel.getState();
                 render.setBoard(GameViewModelMapper.toBoardViewModel(outputData.updatedState()));
                 render.setStatus(GameViewModelMapper.toStatusViewModel(outputData.updatedState()));
-                render.setError(null);
+                render.setMessage(null);
                 gameViewModel.firePropertyChanged();
             }
         });
@@ -43,7 +43,7 @@ public class RequestAiMovePresenter implements RequestAiMoveOutputBoundary {
     @Override
     public void prepareFailView(String error) {
         uiScheduler.runOnUiThread(() -> {
-            gameViewModel.getState().setError(error);
+            gameViewModel.getState().setMessage(error);
             gameViewModel.firePropertyChanged();
         });
     }
