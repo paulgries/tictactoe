@@ -109,12 +109,63 @@ picked "1: per-frame AppBuilder + Main in app".
 - Smoke-tested: `mvn exec:java` launches the frame without exceptions.
 - 97 tests still green.
 
-Not picked (recorded for later): interactor-injected factories +
-`GameStateFactory` interface (CommonUserFactory style), ViewManager-driven
-navigation, `firePropertyChanged(String)` overload.
+Not picked (recorded for later): `firePropertyChanged(String)` overload.
 
 ## Commits (follow-up)
 
 4. `f80c7ef` fix: update exec mainClass after com.tictactoe prefix drop
 5. `e310f3b` chore: commit AGENTS.md auto-reading check transcript
-6. per-frame AppBuilder + app/Main (this commit)
+6. `3f065d7` refactor: wire the frame per use case in AppBuilder and move
+   Main to app
+
+## Follow-up: interactor-injected factories + thin controller
+
+User picked "2" from the delta list.
+
+- `GameStateFactory` became a `CommonUserFactory`-style interface with
+  `CommonGameStateFactory` as its implementation; the entity's static
+  `GameState.newGame` convenience now constructs directly.
+- Both `GameStateFactory` and `AiStrategyFactory` are injected into
+  `StartNewGameInteractor`'s constructor (CAWithBuilder order: boundary,
+  factories). The interactor creates the AI strategy from the input
+  difficulty and carries mode + strategy in `StartNewGameOutputData`.
+- `StartNewGamePresenter` now stashes mode + strategy in the shared bean;
+  `StartNewGameController` shrinks to holding only the `InputBoundary`
+  (plus its `lastInput` cache for `restart()`).
+- `AppBuilder` holds the factories as fields, as CAWithBuilder holds
+  `userFactory`.
+- Tests: interactor test adds an AI-mode case and real-factory constructor
+  args; controller test drops the session-stash assertions (moved to the
+  presenter test); presenter test covers the stash. 99 tests green.
+
+## Follow-up: presenter-driven navigation via a ViewManager
+
+User picked "3" from the delta list.
+
+- Added `framework/ViewManager` and `framework/ViewManagerModel`
+  (`extends ViewModel<String>`) copied in behavior from CAWithBuilder.
+- `StartNewGamePresenter` navigates: `prepareSuccessView` sets the
+  `ViewManagerModel` to `gameViewModel.getViewName()` ("game"); both
+  boundaries gained `switchToSetupView()` (interactor pass-through,
+  controller delegate) so "Change Settings" in `StatusPanel` navigates
+  presenter-driven like CAWithBuilder's `switchToLoginView`.
+- Card names come from the views: `SetupPanel.getViewName()` returns
+  "setup"; the game card is registered under `gameViewModel.getViewName()`.
+  `MainFrame` dropped `showGameScreen()`/`showSetupScreen()` and exposes
+  `getCardPanel()`/`getCardLayout()` for the ViewManager; `SetupPanel` and
+  `StatusPanel` no longer hold a `MainFrame` reference.
+- `AppBuilder.build()` shows the initial setup card via the ViewManagerModel
+  (mirroring CAWithBuilder's `build()`).
+- Tests: presenter test asserts navigation ("game"/"setup", fail path
+  doesn't navigate); controller and interactor tests cover
+  `switchToSetupView` wiring. 102 tests green.
+
+## Commits (later follow-ups)
+
+7. `960415a` docs: require commit-message approval in AGENTS.md
+8. `744cc41` docs: require explicit request before opening PRs in AGENTS.md
+9. `46abbe3` refactor: inject factories into StartNewGameInteractor and thin
+   the controller
+10. `967df93` refactor: make navigation presenter-driven via a ViewManager
+
+Branch: `presenter-appbuilder`, PR #7 against lindseyshorser/tictactoe.
