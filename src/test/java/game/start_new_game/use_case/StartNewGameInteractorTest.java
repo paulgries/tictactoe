@@ -38,7 +38,7 @@ class StartNewGameInteractorTest {
     void execute_ValidRequest_PresentsFreshGameState() {
         GameConfig config = new GameConfig(4, 3);
         StartNewGameInputData inputData =
-            new StartNewGameInputData(config, GameMode.TWO_PLAYER, Optional.<AiDifficulty>empty());
+            new StartNewGameInputData(4, 3, GameMode.TWO_PLAYER, Optional.<AiDifficulty>empty());
 
         interactor.execute(inputData);
 
@@ -57,7 +57,7 @@ class StartNewGameInteractorTest {
     @Test
     void execute_AiMode_CreatesStrategyFromDifficulty() {
         StartNewGameInputData inputData = new StartNewGameInputData(
-                new GameConfig(3, 3), GameMode.HUMAN_VS_AI, Optional.of(AiDifficulty.EASY));
+                3, 3, GameMode.HUMAN_VS_AI, Optional.of(AiDifficulty.EASY));
 
         interactor.execute(inputData);
 
@@ -66,6 +66,18 @@ class StartNewGameInteractorTest {
         verify(presenter).prepareSuccessView(captor.capture());
         assertThat(captor.getValue().mode()).isEqualTo(GameMode.HUMAN_VS_AI);
         assertThat(captor.getValue().aiStrategy()).isPresent();
+    }
+
+    @Test
+    void execute_InvalidConfig_PresentsFailViewWithoutSuccessView() {
+        StartNewGameInputData inputData = new StartNewGameInputData(
+                3, 5, GameMode.TWO_PLAYER, Optional.<AiDifficulty>empty());
+
+        interactor.execute(inputData);
+
+        verify(presenter).prepareFailView(
+            "winLength (5) must not exceed boardSize (3)");
+        verify(presenter, never()).prepareSuccessView(any());
     }
 
     @Test

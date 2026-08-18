@@ -1,5 +1,6 @@
 package game.request_ai_move.use_case;
 
+import game.domain.GameState;
 import game.domain.Position;
 import game.domain.exception.InvalidMoveException;
 
@@ -24,7 +25,8 @@ public final class RequestAiMoveInteractor implements RequestAiMoveInputBoundary
         Position move = inputData.strategy()
             .selectMove(inputData.state().board(), inputData.state().config(), inputData.state().currentTurn());
         try {
-            presenter.prepareSuccessView(new RequestAiMoveOutputData(inputData.state().applyMove(move)));
+            GameState updated = inputData.state().applyMove(move);
+            presenter.prepareSuccessView(new RequestAiMoveOutputData(updated, inputData.state()));
         } catch (InvalidMoveException e) {
             presenter.prepareFailView(e.getMessage());
         }

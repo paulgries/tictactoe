@@ -10,7 +10,9 @@ import framework.UiScheduler;
 /**
  * The Presenter for the Request AI Move Use Case. Applies the AI move on the
  * UI thread, discarding the result if the session moved on (e.g. a restart)
- * while the move was being computed in the background.
+ * while the move was being computed in the background; staleness is checked
+ * against the base the result was computed from, which travels in the
+ * output data.
  */
 public class RequestAiMovePresenter implements RequestAiMoveOutputBoundary {
 
@@ -26,7 +28,7 @@ public class RequestAiMovePresenter implements RequestAiMoveOutputBoundary {
     public void prepareSuccessView(RequestAiMoveOutputData outputData) {
         uiScheduler.runOnUiThread(() -> {
             final GameState state = gameViewModel.getState();
-            if (!state.isStaleAiResult()) {
+            if (state.getCurrentGameState().equals(outputData.base())) {
                 state.setCurrentGameState(outputData.updatedState());
                 state.setBoard(GameViewModelMapper.toBoardViewModel(outputData.updatedState()));
                 state.setStatus(GameViewModelMapper.toStatusViewModel(outputData.updatedState()));

@@ -1,6 +1,9 @@
 package game.start_new_game;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -36,8 +39,8 @@ class StartNewGameControllerTest {
         ArgumentCaptor<StartNewGameInputData> captor =
             ArgumentCaptor.forClass(StartNewGameInputData.class);
         verify(startNewGameUseCase).execute(captor.capture());
-        assertThat(captor.getValue().config().boardSize()).isEqualTo(4);
-        assertThat(captor.getValue().config().winLength()).isEqualTo(3);
+        assertThat(captor.getValue().boardSize()).isEqualTo(4);
+        assertThat(captor.getValue().winLength()).isEqualTo(3);
         assertThat(captor.getValue().mode()).isEqualTo(GameMode.HUMAN_VS_AI);
         assertThat(captor.getValue().aiDifficulty()).contains(AiDifficulty.EASY);
     }
@@ -61,9 +64,17 @@ class StartNewGameControllerTest {
         ArgumentCaptor<StartNewGameInputData> captor =
             ArgumentCaptor.forClass(StartNewGameInputData.class);
         verify(startNewGameUseCase, times(2)).execute(captor.capture());
-        assertThat(captor.getAllValues()).extracting(StartNewGameInputData::config)
-            .containsOnly(captor.getAllValues().get(0).config());
+        assertThat(captor.getAllValues()).extracting(StartNewGameInputData::boardSize)
+            .containsOnly(captor.getAllValues().get(0).boardSize());
         assertThat(captor.getValue().mode()).isEqualTo(GameMode.TWO_PLAYER);
+    }
+
+    @Test
+    void restart_BeforeAnyExecute_Throws() {
+        assertThatThrownBy(() -> controller.restart())
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("cannot restart before a game has been started");
+        verify(startNewGameUseCase, never()).execute(any());
     }
 
     @Test

@@ -47,7 +47,7 @@ class RequestAiMoveControllerTest {
     }
 
     @Test
-    void execute_MarksPendingBaseAndRunsInteractorInBackgroundWithSnapshotAndStrategy() {
+    void execute_RunsInteractorInBackgroundWithSnapshotAndStrategy() {
         game.domain.GameState current = game.domain.GameState.newGame(CONFIG_3X3);
         game.domain.GameState base = current.applyMove(new Position(0, 0));
         gameViewModel.getState().setCurrentGameState(base);
@@ -55,7 +55,6 @@ class RequestAiMoveControllerTest {
 
         controller.execute();
 
-        assertThat(gameViewModel.getState().getPendingAiBase()).isEqualTo(base);
         assertThat(scheduler.pendingBackgroundTasks()).isEqualTo(1);
 
         scheduler.runNextBackgroundTask();

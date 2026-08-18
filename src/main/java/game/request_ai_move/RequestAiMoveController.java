@@ -9,8 +9,9 @@ import framework.UiScheduler;
 
 /**
  * The Controller for the Request AI Move Use Case. Runs the use case in the
- * background on a snapshot of the current session, marking that snapshot so
- * the presenter can discard stale results after a restart.
+ * background on a snapshot of the current session; the snapshot is passed
+ * through the boundary and echoed back in the output so the presenter can
+ * discard stale results after a restart.
  */
 public class RequestAiMoveController {
 
@@ -29,13 +30,12 @@ public class RequestAiMoveController {
 
     public void execute() {
         final GameState state = gameViewModel.getState();
-        state.setPendingAiBase(state.getCurrentGameState());
+        final game.domain.GameState base = state.getCurrentGameState();
         final AiStrategy strategy = state.getAiStrategy()
             .orElseThrow(() -> new NullPointerException("no AI strategy is active"));
 
         uiScheduler.runInBackground(() -> {
-            requestAiMoveUseCase.execute(new RequestAiMoveInputData(
-                    state.getPendingAiBase(), strategy));
+            requestAiMoveUseCase.execute(new RequestAiMoveInputData(base, strategy));
         });
     }
 }

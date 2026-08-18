@@ -1,7 +1,6 @@
 package game.start_new_game;
 
 import game.domain.AiDifficulty;
-import game.domain.GameConfig;
 import game.domain.GameMode;
 import game.start_new_game.use_case.StartNewGameInputBoundary;
 import game.start_new_game.use_case.StartNewGameInputData;
@@ -24,14 +23,17 @@ public class StartNewGameController {
 
     public void execute(int boardSize, int winLength, GameMode mode,
                         Optional<AiDifficulty> aiDifficulty) {
-        final StartNewGameInputData inputData = new StartNewGameInputData(
-                new GameConfig(boardSize, winLength), mode, aiDifficulty);
+        final StartNewGameInputData inputData =
+                new StartNewGameInputData(boardSize, winLength, mode, aiDifficulty);
         this.lastInput = inputData;
 
         startNewGameUseCase.execute(inputData);
     }
 
     public void restart() {
+        if (lastInput == null) {
+            throw new IllegalStateException("cannot restart before a game has been started");
+        }
         startNewGameUseCase.execute(lastInput);
     }
 

@@ -8,15 +8,13 @@ import java.util.Optional;
 /**
  * The state for the Game View Model: everything the board view needs to render
  * plus the session data the controllers and presenters share across use cases
- * (the current domain state, the game mode, the AI strategy, and the base state
- * used to discard stale AI results after a restart).
+ * (the current domain state, the game mode, and the AI strategy).
  */
 public class GameState {
 
     private game.domain.GameState currentGameState;
     private GameMode mode;
     private Optional<AiStrategy> aiStrategy = Optional.empty();
-    private game.domain.GameState pendingAiBase;
     private BoardViewModel board;
     private StatusViewModel status;
     private String error;
@@ -43,14 +41,6 @@ public class GameState {
 
     public void setAiStrategy(Optional<AiStrategy> aiStrategy) {
         this.aiStrategy = aiStrategy;
-    }
-
-    public game.domain.GameState getPendingAiBase() {
-        return pendingAiBase;
-    }
-
-    public void setPendingAiBase(game.domain.GameState pendingAiBase) {
-        this.pendingAiBase = pendingAiBase;
     }
 
     public BoardViewModel getBoard() {
@@ -86,9 +76,5 @@ public class GameState {
             && mode == GameMode.HUMAN_VS_AI
             && !currentGameState.isGameOver()
             && currentGameState.currentTurn() == Mark.X.other();
-    }
-
-    public boolean isStaleAiResult() {
-        return pendingAiBase == null || !currentGameState.equals(pendingAiBase);
     }
 }

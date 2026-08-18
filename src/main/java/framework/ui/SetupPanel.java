@@ -2,7 +2,6 @@ package framework.ui;
 
 import game.domain.AiDifficulty;
 import game.domain.GameMode;
-import game.domain.exception.InvalidGameConfigException;
 import game.start_new_game.StartNewGameController;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -15,7 +14,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
@@ -143,11 +141,6 @@ public final class SetupPanel extends JPanel {
             ? Optional.of((AiDifficulty) difficultyBox.getSelectedItem())
             : Optional.empty();
 
-        try {
-            startNewGameController.execute(boardSize, winLength, mode, difficulty);
-        } catch (InvalidGameConfigException ex) {
-            JOptionPane.showMessageDialog(
-                this, ex.getMessage(), "Invalid Settings", JOptionPane.ERROR_MESSAGE);
-        }
+        startNewGameController.execute(boardSize, winLength, mode, difficulty);
     }
 }

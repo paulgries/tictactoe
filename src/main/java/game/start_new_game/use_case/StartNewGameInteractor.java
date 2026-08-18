@@ -2,7 +2,9 @@ package game.start_new_game.use_case;
 
 import game.ai.AiStrategy;
 import game.ai.AiStrategyFactory;
+import game.domain.GameConfig;
 import game.domain.GameStateFactory;
+import game.domain.exception.InvalidGameConfigException;
 import java.util.Optional;
 
 /**
@@ -30,10 +32,15 @@ public final class StartNewGameInteractor implements StartNewGameInputBoundary {
     public void execute(StartNewGameInputData inputData) {
         final Optional<AiStrategy> aiStrategy = inputData.aiDifficulty()
                 .map(aiStrategyFactory::create);
-        presenter.prepareSuccessView(new StartNewGameOutputData(
-                gameStateFactory.newGame(inputData.config()),
-                inputData.mode(),
-                aiStrategy));
+        try {
+            final GameConfig config = new GameConfig(inputData.boardSize(), inputData.winLength());
+            presenter.prepareSuccessView(new StartNewGameOutputData(
+                    gameStateFactory.newGame(config),
+                    inputData.mode(),
+                    aiStrategy));
+        } catch (InvalidGameConfigException e) {
+            presenter.prepareFailView(e.getMessage());
+        }
     }
 
     @Override

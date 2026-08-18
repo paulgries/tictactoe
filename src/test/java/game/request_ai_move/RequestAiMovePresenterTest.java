@@ -38,9 +38,8 @@ class RequestAiMovePresenterTest {
         game.domain.GameState moved = base.applyMove(new Position(1, 1));
         GameState session = gameViewModel.getState();
         session.setCurrentGameState(base);
-        session.setPendingAiBase(base);
 
-        presenter.prepareSuccessView(new RequestAiMoveOutputData(moved));
+        presenter.prepareSuccessView(new RequestAiMoveOutputData(moved, base));
 
         assertThat(scheduler.pendingUiTasks()).isEqualTo(1);
         assertThat(gameViewModel.getState().getCurrentGameState()).isEqualTo(base);
@@ -59,9 +58,8 @@ class RequestAiMovePresenterTest {
         game.domain.GameState moved = base.applyMove(new Position(1, 1));
         GameState session = gameViewModel.getState();
         session.setCurrentGameState(base);
-        session.setPendingAiBase(base);
 
-        presenter.prepareSuccessView(new RequestAiMoveOutputData(moved));
+        presenter.prepareSuccessView(new RequestAiMoveOutputData(moved, base));
 
         // the session moved on (e.g. a restart) before the UI task ran
         game.domain.GameState fresh = GameFixtures.wonByX();

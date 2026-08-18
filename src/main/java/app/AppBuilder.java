@@ -63,6 +63,10 @@ public class AppBuilder {
     }
 
     public AppBuilder addMakeHumanMoveUseCase() {
+        if (requestAiMoveController == null) {
+            throw new IllegalStateException(
+                "addRequestAiMoveUseCase() must be called before addMakeHumanMoveUseCase()");
+        }
         final MakeHumanMovePresenter makeHumanMovePresenter =
                 new MakeHumanMovePresenter(gameViewModel, requestAiMoveController::execute);
         final MakeHumanMoveController makeHumanMoveController = new MakeHumanMoveController(
