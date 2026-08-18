@@ -1,10 +1,10 @@
-package com.tictactoe.game.domain;
+package game.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Optional;
-import com.tictactoe.game.testutil.GameFixtures;
+import game.testutil.GameFixtures;
 import org.junit.jupiter.api.Test;
 
 class WinCheckerTest {

@@ -1,9 +1,9 @@
-package com.tictactoe.game.domain;
+package game.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.tictactoe.game.domain.exception.InvalidMoveException;
+import game.domain.exception.InvalidMoveException;
 import org.junit.jupiter.api.Test;
 
 class BoardTest {

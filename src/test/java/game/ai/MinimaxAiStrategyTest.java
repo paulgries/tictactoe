@@ -1,13 +1,13 @@
-package com.tictactoe.game.ai;
+package game.ai;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tictactoe.game.domain.Board;
-import com.tictactoe.game.domain.GameConfig;
-import com.tictactoe.game.domain.GameState;
-import com.tictactoe.game.domain.Mark;
-import com.tictactoe.game.domain.Position;
-import com.tictactoe.game.domain.Win;
+import game.domain.Board;
+import game.domain.GameConfig;
+import game.domain.GameState;
+import game.domain.Mark;
+import game.domain.Position;
+import game.domain.Win;
 import org.junit.jupiter.api.Test;
 
 class MinimaxAiStrategyTest {
@@ -65,7 +65,7 @@ class MinimaxAiStrategyTest {
             state = state.applyMove(move);
         }
 
-        assertThat(state.status()).isInstanceOf(com.tictactoe.game.domain.Draw.class);
+        assertThat(state.status()).isInstanceOf(game.domain.Draw.class);
     }
 
     @Test

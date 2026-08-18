@@ -1,13 +1,13 @@
-package com.tictactoe.game.ai;
+package game.ai;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.tictactoe.game.domain.Board;
-import com.tictactoe.game.domain.GameConfig;
-import com.tictactoe.game.domain.Mark;
-import com.tictactoe.game.domain.Position;
-import com.tictactoe.game.domain.exception.InvalidMoveException;
+import game.domain.Board;
+import game.domain.GameConfig;
+import game.domain.Mark;
+import game.domain.Position;
+import game.domain.exception.InvalidMoveException;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 

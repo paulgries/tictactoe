@@ -1,12 +1,12 @@
-package com.tictactoe.game.ai;
+package game.ai;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tictactoe.game.domain.AiDifficulty;
-import com.tictactoe.game.ai.AiStrategy;
-import com.tictactoe.game.ai.EasyAiStrategy;
-import com.tictactoe.game.ai.MinimaxAiStrategy;
-import com.tictactoe.game.ai.RandomAiStrategy;
+import game.domain.AiDifficulty;
+import game.ai.AiStrategy;
+import game.ai.EasyAiStrategy;
+import game.ai.MinimaxAiStrategy;
+import game.ai.RandomAiStrategy;
 import org.junit.jupiter.api.Test;
 
 class AiStrategyFactoryTest {

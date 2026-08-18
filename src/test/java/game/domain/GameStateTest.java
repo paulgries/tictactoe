@@ -1,10 +1,10 @@
-package com.tictactoe.game.domain;
+package game.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.tictactoe.game.domain.exception.InvalidMoveException;
-import com.tictactoe.game.testutil.GameFixtures;
+import game.domain.exception.InvalidMoveException;
+import game.testutil.GameFixtures;
 import org.junit.jupiter.api.Test;
 
 class GameStateTest {

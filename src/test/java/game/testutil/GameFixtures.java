@@ -1,10 +1,10 @@
-package com.tictactoe.game.testutil;
+package game.testutil;
 
-import com.tictactoe.game.domain.Board;
-import com.tictactoe.game.domain.GameConfig;
-import com.tictactoe.game.domain.GameState;
-import com.tictactoe.game.domain.Mark;
-import com.tictactoe.game.domain.Position;
+import game.domain.Board;
+import game.domain.GameConfig;
+import game.domain.GameState;
+import game.domain.Mark;
+import game.domain.Position;
 
 /**
  * Reusable game fixtures for tests.

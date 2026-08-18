@@ -1,15 +1,15 @@
-package com.tictactoe.game.make_human_move.use_case;
+package game.make_human_move.use_case;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import com.tictactoe.game.domain.GameConfig;
-import com.tictactoe.game.domain.GameState;
-import com.tictactoe.game.domain.Mark;
-import com.tictactoe.game.domain.Position;
-import com.tictactoe.game.testutil.GameFixtures;
+import game.domain.GameConfig;
+import game.domain.GameState;
+import game.domain.Mark;
+import game.domain.Position;
+import game.testutil.GameFixtures;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

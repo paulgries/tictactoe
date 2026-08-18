@@ -1,4 +1,4 @@
-package com.tictactoe.game.domain;
+package game.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

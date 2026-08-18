@@ -1,15 +1,15 @@
-package com.tictactoe.game.start_new_game.use_case;
+package game.start_new_game.use_case;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import com.tictactoe.game.domain.AiDifficulty;
-import com.tictactoe.game.domain.GameConfig;
-import com.tictactoe.game.domain.GameMode;
-import com.tictactoe.game.domain.InProgress;
-import com.tictactoe.game.domain.Mark;
+import game.domain.AiDifficulty;
+import game.domain.GameConfig;
+import game.domain.GameMode;
+import game.domain.InProgress;
+import game.domain.Mark;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

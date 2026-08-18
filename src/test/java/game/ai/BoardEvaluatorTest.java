@@ -1,12 +1,12 @@
-package com.tictactoe.game.ai;
+package game.ai;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tictactoe.game.domain.Board;
-import com.tictactoe.game.domain.GameConfig;
-import com.tictactoe.game.domain.Mark;
-import com.tictactoe.game.domain.Position;
-import com.tictactoe.game.testutil.GameFixtures;
+import game.domain.Board;
+import game.domain.GameConfig;
+import game.domain.Mark;
+import game.domain.Position;
+import game.testutil.GameFixtures;
 import org.junit.jupiter.api.Test;
 
 class BoardEvaluatorTest {
