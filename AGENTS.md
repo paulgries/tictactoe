@@ -20,6 +20,8 @@ repo-specific details) to carry the workflow forward.
   sequentially.
 - Push to the user's fork; open PRs against upstream with `gh`:
   `gh pr create --repo <upstream> --base main --head <fork>:<branch>`.
+- **Only submit a PR when the user explicitly requests it.** Never open a PR
+  automatically (e.g. after finishing a piece of work or a commit).
 - Open a PR to `main`, **Rebase and merge** to keep history linear.
 - The user reviews and approves/merges the PR themselves.
 - Branches are **kept** (not deleted) as teaching artifacts.
