@@ -1,4 +1,4 @@
-package com.tictactoe.game.use_case;
+package com.tictactoe.game.request_ai_move.use_case;
 
 /**
  * Input boundary for the Request AI Move Use Case.

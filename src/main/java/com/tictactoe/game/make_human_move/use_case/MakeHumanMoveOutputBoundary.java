@@ -1,4 +1,4 @@
-package com.tictactoe.game.use_case;
+package com.tictactoe.game.make_human_move.use_case;
 
 /**
  * Output boundary for the Make Human Move Use Case.

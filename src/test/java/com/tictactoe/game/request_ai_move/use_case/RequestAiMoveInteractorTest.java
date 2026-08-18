@@ -1,4 +1,4 @@
-package com.tictactoe.game.use_case;
+package com.tictactoe.game.request_ai_move.use_case;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;

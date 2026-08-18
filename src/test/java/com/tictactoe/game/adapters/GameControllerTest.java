@@ -12,9 +12,7 @@ import com.tictactoe.game.adapters.viewmodel.BoardViewModel;
 import com.tictactoe.game.adapters.viewmodel.CellSymbol;
 import com.tictactoe.game.adapters.viewmodel.GameOutcomeKind;
 import com.tictactoe.game.adapters.viewmodel.StatusViewModel;
-import com.tictactoe.game.NewGameRequest;
 import com.tictactoe.game.domain.AiDifficulty;
-import com.tictactoe.game.domain.GameConfig;
 import com.tictactoe.game.domain.GameMode;
 import com.tictactoe.game.domain.Position;
 import java.util.ArrayList;
@@ -24,8 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 class GameControllerTest {
-
-    private static final GameConfig CONFIG_3X3 = new GameConfig(3, 3);
 
     private GameController newController(GameView view) {
         return newController(view, immediateScheduler());
@@ -38,8 +34,8 @@ class GameControllerTest {
             .build();
     }
 
-    private NewGameRequest twoPlayerRequest() {
-        return new NewGameRequest(CONFIG_3X3, GameMode.TWO_PLAYER, Optional.empty());
+    private void startTwoPlayerGame(GameController controller) {
+        controller.onStartGameRequested(3, 3, GameMode.TWO_PLAYER, Optional.empty());
     }
 
     private CellSymbol cellAt(BoardViewModel board, int row, int column) {
@@ -114,7 +110,7 @@ class GameControllerTest {
         GameView view = mock(GameView.class);
         GameController controller = newController(view);
 
-        controller.onStartGameRequested(twoPlayerRequest());
+        startTwoPlayerGame(controller);
 
         BoardViewModel board = lastBoard(view);
         assertThat(board.cells()).hasSize(9);
@@ -126,7 +122,7 @@ class GameControllerTest {
     void onCellClickedAppliesHumanMoveAndRendersUpdatedBoard() {
         GameView view = mock(GameView.class);
         GameController controller = newController(view);
-        controller.onStartGameRequested(twoPlayerRequest());
+        startTwoPlayerGame(controller);
 
         controller.onCellClicked(0, 0);
 
@@ -137,7 +133,7 @@ class GameControllerTest {
     void onCellClickedOnOccupiedCellShowsErrorAndDoesNotChangeBoard() {
         GameView view = mock(GameView.class);
         GameController controller = newController(view);
-        controller.onStartGameRequested(twoPlayerRequest());
+        startTwoPlayerGame(controller);
         controller.onCellClicked(0, 0);
         BoardViewModel boardAfterFirstMove = lastBoard(view);
 
@@ -151,7 +147,7 @@ class GameControllerTest {
     void onCellClickedIgnoredWhenGameIsOver() {
         GameView view = mock(GameView.class);
         GameController controller = newController(view);
-        controller.onStartGameRequested(twoPlayerRequest());
+        startTwoPlayerGame(controller);
         controller.onCellClicked(0, 0); // X
         controller.onCellClicked(1, 0); // O
         controller.onCellClicked(0, 1); // X
@@ -170,7 +166,7 @@ class GameControllerTest {
         GameView view = mock(GameView.class);
         GameController controller = newController(view);
         controller.onStartGameRequested(
-            new NewGameRequest(CONFIG_3X3, GameMode.HUMAN_VS_AI, Optional.of(AiDifficulty.MEDIUM)));
+            3, 3, GameMode.HUMAN_VS_AI, Optional.of(AiDifficulty.MEDIUM));
 
         controller.onCellClicked(0, 0);
 
@@ -186,7 +182,7 @@ class GameControllerTest {
         CapturingScheduler scheduler = new CapturingScheduler();
         GameController controller = newController(view, scheduler.scheduler);
         controller.onStartGameRequested(
-            new NewGameRequest(CONFIG_3X3, GameMode.HUMAN_VS_AI, Optional.of(AiDifficulty.MEDIUM)));
+            3, 3, GameMode.HUMAN_VS_AI, Optional.of(AiDifficulty.MEDIUM));
 
         controller.onCellClicked(0, 0);
 
@@ -206,7 +202,7 @@ class GameControllerTest {
         CapturingScheduler scheduler = new CapturingScheduler();
         GameController controller = newController(view, scheduler.scheduler);
         controller.onStartGameRequested(
-            new NewGameRequest(CONFIG_3X3, GameMode.HUMAN_VS_AI, Optional.of(AiDifficulty.MEDIUM)));
+            3, 3, GameMode.HUMAN_VS_AI, Optional.of(AiDifficulty.MEDIUM));
         controller.onCellClicked(0, 0); // AI's background move is captured, not yet run
 
         controller.onCellClicked(2, 2); // it's O's (the AI's) turn; this should be ignored
@@ -220,7 +216,7 @@ class GameControllerTest {
         CapturingScheduler scheduler = new CapturingScheduler();
         GameController controller = newController(view, scheduler.scheduler);
         controller.onStartGameRequested(
-            new NewGameRequest(CONFIG_3X3, GameMode.HUMAN_VS_AI, Optional.of(AiDifficulty.MEDIUM)));
+            3, 3, GameMode.HUMAN_VS_AI, Optional.of(AiDifficulty.MEDIUM));
         controller.onCellClicked(0, 0); // AI's background move is captured, not yet run
 
         controller.onRestartRequested();
@@ -234,7 +230,7 @@ class GameControllerTest {
     void onRestartRequestedResetsToFreshBoardWithSameConfig() {
         GameView view = mock(GameView.class);
         GameController controller = newController(view);
-        controller.onStartGameRequested(twoPlayerRequest());
+        startTwoPlayerGame(controller);
         controller.onCellClicked(0, 0);
 
         controller.onRestartRequested();
@@ -247,7 +243,7 @@ class GameControllerTest {
     void onGameWonDisplaysStatusWithWinnerAndHighlightedLine() {
         GameView view = mock(GameView.class);
         GameController controller = newController(view);
-        controller.onStartGameRequested(twoPlayerRequest());
+        startTwoPlayerGame(controller);
 
         controller.onCellClicked(0, 0); // X
         controller.onCellClicked(1, 0); // O
@@ -265,7 +261,7 @@ class GameControllerTest {
     void onGameDrawnDisplaysDrawStatus() {
         GameView view = mock(GameView.class);
         GameController controller = newController(view);
-        controller.onStartGameRequested(twoPlayerRequest());
+        startTwoPlayerGame(controller);
 
         // X O X
         // X X O

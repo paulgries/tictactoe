@@ -1,7 +1,6 @@
 package com.tictactoe.framework.ui;
 
 import com.tictactoe.game.adapters.GameController;
-import com.tictactoe.game.adapters.NewGameRequestFactory;
 import com.tictactoe.game.domain.AiDifficulty;
 import com.tictactoe.game.domain.GameMode;
 import com.tictactoe.game.domain.exception.InvalidGameConfigException;
@@ -141,8 +140,7 @@ public final class SetupPanel extends JPanel {
             : Optional.empty();
 
         try {
-            controller.onStartGameRequested(
-                NewGameRequestFactory.create(boardSize, winLength, mode, difficulty));
+            controller.onStartGameRequested(boardSize, winLength, mode, difficulty);
             mainFrame.showGameScreen();
         } catch (InvalidGameConfigException ex) {
             JOptionPane.showMessageDialog(

@@ -2,26 +2,27 @@ package com.tictactoe.game.adapters;
 
 import com.tictactoe.game.ai.AiStrategy;
 import com.tictactoe.game.ai.AiStrategyFactory;
-import com.tictactoe.game.NewGameRequest;
+import com.tictactoe.game.domain.AiDifficulty;
+import com.tictactoe.game.domain.GameConfig;
 import com.tictactoe.game.domain.GameMode;
 import com.tictactoe.game.domain.GameState;
 import com.tictactoe.game.domain.Mark;
 import com.tictactoe.game.domain.Position;
-import com.tictactoe.game.use_case.MakeHumanMoveInputBoundary;
-import com.tictactoe.game.use_case.MakeHumanMoveInputData;
-import com.tictactoe.game.use_case.MakeHumanMoveInteractor;
-import com.tictactoe.game.use_case.MakeHumanMoveOutputBoundary;
-import com.tictactoe.game.use_case.MakeHumanMoveOutputData;
-import com.tictactoe.game.use_case.RequestAiMoveInputBoundary;
-import com.tictactoe.game.use_case.RequestAiMoveInputData;
-import com.tictactoe.game.use_case.RequestAiMoveInteractor;
-import com.tictactoe.game.use_case.RequestAiMoveOutputBoundary;
-import com.tictactoe.game.use_case.RequestAiMoveOutputData;
-import com.tictactoe.game.use_case.StartNewGameInputBoundary;
-import com.tictactoe.game.use_case.StartNewGameInputData;
-import com.tictactoe.game.use_case.StartNewGameInteractor;
-import com.tictactoe.game.use_case.StartNewGameOutputBoundary;
-import com.tictactoe.game.use_case.StartNewGameOutputData;
+import com.tictactoe.game.make_human_move.use_case.MakeHumanMoveInputBoundary;
+import com.tictactoe.game.make_human_move.use_case.MakeHumanMoveInputData;
+import com.tictactoe.game.make_human_move.use_case.MakeHumanMoveInteractor;
+import com.tictactoe.game.make_human_move.use_case.MakeHumanMoveOutputBoundary;
+import com.tictactoe.game.make_human_move.use_case.MakeHumanMoveOutputData;
+import com.tictactoe.game.request_ai_move.use_case.RequestAiMoveInputBoundary;
+import com.tictactoe.game.request_ai_move.use_case.RequestAiMoveInputData;
+import com.tictactoe.game.request_ai_move.use_case.RequestAiMoveInteractor;
+import com.tictactoe.game.request_ai_move.use_case.RequestAiMoveOutputBoundary;
+import com.tictactoe.game.request_ai_move.use_case.RequestAiMoveOutputData;
+import com.tictactoe.game.start_new_game.use_case.StartNewGameInputBoundary;
+import com.tictactoe.game.start_new_game.use_case.StartNewGameInputData;
+import com.tictactoe.game.start_new_game.use_case.StartNewGameInteractor;
+import com.tictactoe.game.start_new_game.use_case.StartNewGameOutputBoundary;
+import com.tictactoe.game.start_new_game.use_case.StartNewGameOutputData;
 import java.util.Optional;
 
 public final class GameController implements
@@ -37,7 +38,7 @@ public final class GameController implements
     private final UiScheduler uiScheduler;
 
     private GameState currentState;
-    private NewGameRequest lastRequest;
+    private StartNewGameInputData lastStartRequest;
     private GameState pendingAiBase;
     private Optional<AiStrategy> aiStrategy = Optional.empty();
 
@@ -86,12 +87,15 @@ public final class GameController implements
         view.displayError(error);
     }
 
-    public void onStartGameRequested(NewGameRequest request) {
-        this.lastRequest = request;
-        this.aiStrategy = request.mode() == GameMode.HUMAN_VS_AI
-            ? Optional.of(aiStrategyFactory.create(request.aiDifficulty().orElseThrow()))
+    public void onStartGameRequested(
+            int boardSize, int winLength, GameMode mode, Optional<AiDifficulty> aiDifficulty) {
+        StartNewGameInputData inputData =
+            new StartNewGameInputData(new GameConfig(boardSize, winLength), mode, aiDifficulty);
+        this.lastStartRequest = inputData;
+        this.aiStrategy = mode == GameMode.HUMAN_VS_AI
+            ? Optional.of(aiStrategyFactory.create(aiDifficulty.orElseThrow()))
             : Optional.empty();
-        startNewGameUseCase.execute(new StartNewGameInputData(request));
+        startNewGameUseCase.execute(inputData);
     }
 
     public void onCellClicked(int row, int column) {
@@ -103,12 +107,12 @@ public final class GameController implements
     }
 
     public void onRestartRequested() {
-        startNewGameUseCase.execute(new StartNewGameInputData(lastRequest));
+        startNewGameUseCase.execute(lastStartRequest);
     }
 
     private boolean isAiTurn() {
         return !currentState.isGameOver()
-            && lastRequest.mode() == GameMode.HUMAN_VS_AI
+            && lastStartRequest.mode() == GameMode.HUMAN_VS_AI
             && currentState.currentTurn() == AI_MARK;
     }
 

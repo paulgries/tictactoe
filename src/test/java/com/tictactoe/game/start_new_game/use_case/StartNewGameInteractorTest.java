@@ -1,11 +1,11 @@
-package com.tictactoe.game.use_case;
+package com.tictactoe.game.start_new_game.use_case;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import com.tictactoe.game.NewGameRequest;
+import com.tictactoe.game.domain.AiDifficulty;
 import com.tictactoe.game.domain.GameConfig;
 import com.tictactoe.game.domain.GameMode;
 import com.tictactoe.game.domain.InProgress;
@@ -34,9 +34,10 @@ class StartNewGameInteractorTest {
     @Test
     void execute_ValidRequest_PresentsFreshGameState() {
         GameConfig config = new GameConfig(4, 3);
-        NewGameRequest request = new NewGameRequest(config, GameMode.TWO_PLAYER, Optional.empty());
+        StartNewGameInputData inputData =
+            new StartNewGameInputData(config, GameMode.TWO_PLAYER, Optional.<AiDifficulty>empty());
 
-        interactor.execute(new StartNewGameInputData(request));
+        interactor.execute(inputData);
 
         ArgumentCaptor<StartNewGameOutputData> captor =
             ArgumentCaptor.forClass(StartNewGameOutputData.class);

@@ -1,4 +1,4 @@
-package com.tictactoe.game.use_case;
+package com.tictactoe.game.start_new_game.use_case;
 
 import com.tictactoe.game.domain.GameStateFactory;
 
@@ -16,6 +16,6 @@ public final class StartNewGameInteractor implements StartNewGameInputBoundary {
     @Override
     public void execute(StartNewGameInputData inputData) {
         presenter.prepareSuccessView(new StartNewGameOutputData(
-            GameStateFactory.newGame(inputData.request().config())));
+            GameStateFactory.newGame(inputData.config())));
     }
 }

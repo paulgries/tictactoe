@@ -1,4 +1,4 @@
-package com.tictactoe.game.use_case;
+package com.tictactoe.game.request_ai_move.use_case;
 
 import com.tictactoe.game.ai.AiStrategy;
 import com.tictactoe.game.domain.GameState;

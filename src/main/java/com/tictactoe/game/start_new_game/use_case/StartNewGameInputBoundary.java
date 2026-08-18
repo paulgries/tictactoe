@@ -1,4 +1,4 @@
-package com.tictactoe.game.use_case;
+package com.tictactoe.game.start_new_game.use_case;
 
 /**
  * Input boundary for the Start New Game Use Case.
