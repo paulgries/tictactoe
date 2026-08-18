@@ -12,7 +12,11 @@ repo-specific details) to carry the workflow forward.
 
 ## Branching & PRs
 
-- Branch off `main` for each piece of work.
+- Branch off `main` for each piece of work. Branches may be **stacked**
+  (branch off the previous branch) when several PRs will merge to `main`
+  sequentially.
+- Push to the user's fork; open PRs against upstream with `gh`:
+  `gh pr create --repo <upstream> --base main --head <fork>:<branch>`.
 - Open a PR to `main`, **Rebase and merge** to keep history linear.
 - The user reviews and approves/merges the PR themselves.
 - Branches are **kept** (not deleted) as teaching artifacts.
@@ -30,6 +34,11 @@ repo-specific details) to carry the workflow forward.
   - `user/` (shared domain entity)
   - `data_access/`, `framework/`, `app/`
 - Build a `CommonUser`/`CommonUserFactory` style entity for domain models.
+- Each use case gets a boundary set under its `use_case` package:
+  `InputBoundary`, `InputData`, `Interactor`, `OutputBoundary`, `OutputData`.
+  Interactors are `void` and receive the `OutputBoundary` in their
+  constructor; adapter-side controllers implement the `OutputBoundary` and
+  wire the interactors internally.
 
 ## Testing
 
@@ -39,7 +48,16 @@ repo-specific details) to carry the workflow forward.
 - Use real entities/implementations where possible; mock only boundaries
   (DAOs, presenters).
 - Assert on the real effect (e.g. captured saved user), not just method calls.
+- Boundary/interactor tests verify **wiring** (presenter called / never
+  called, what was passed) without re-asserting domain mechanics covered by
+  domain tests; drop tests that fully duplicate lower-layer coverage (one
+  fail path suffices when cases share the same translation).
+- Extract repeated fixtures into a shared test helper
+  (e.g. `com.tictactoe.game.testutil.GameFixtures`) instead of duplicating
+  board/state-building sequences in each test class.
 - Run `mvn clean test` — incremental compilation can report false positives.
+  `mvn` output is the source of truth; ignore stale editor/LSP diagnostics
+  on in-progress branches.
 - Test names: `Method_Condition_Expectation` style.
 
 ## Naming conventions
