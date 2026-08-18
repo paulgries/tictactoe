@@ -87,3 +87,34 @@ real capability layout.
    AGENTS.md
 
 Branch: `presenter-appbuilder`, PR #7 against lindseyshorser/tictactoe.
+
+## Follow-up: per-frame AppBuilder + Main in app (PR #7, extended)
+
+Delta analysis vs CAWithBuilder surfaced several remaining gaps; the user
+picked "1: per-frame AppBuilder + Main in app".
+
+- `AppBuilder` now has one fluent method per frame and per use case
+  (`addGameView()`, `addRequestAiMoveUseCase()`, `addMakeHumanMoveUseCase()`,
+  `addStartNewGameUseCase()`), each returning `this`; `build()` returns the
+  frame. `requestAiMoveController` is a field because
+  `addMakeHumanMoveUseCase()` wires `MakeHumanMovePresenter` with
+  `requestAiMoveController::execute` — order matters, as in CAWithBuilder
+  (views before use cases).
+- `MainFrame.setControllers(...)` split into per-controller setters
+  (`setStartNewGameController`, `setMakeHumanMoveController`), mirroring
+  CAWithBuilder's `view.setXController(...)`.
+- `Main` moved from `framework/` to `app/` (git mv), chains the builder and
+  calls `pack()` + `setVisible(true)`; dropped the `SwingUtilities.invokeLater`
+  wrapper to match CAWithBuilder. pom `mainClass` updated to `app.Main`.
+- Smoke-tested: `mvn exec:java` launches the frame without exceptions.
+- 97 tests still green.
+
+Not picked (recorded for later): interactor-injected factories +
+`GameStateFactory` interface (CommonUserFactory style), ViewManager-driven
+navigation, `firePropertyChanged(String)` overload.
+
+## Commits (follow-up)
+
+4. `f80c7ef` fix: update exec mainClass after com.tictactoe prefix drop
+5. `e310f3b` chore: commit AGENTS.md auto-reading check transcript
+6. per-frame AppBuilder + app/Main (this commit)

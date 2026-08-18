@@ -14,43 +14,24 @@ import game.start_new_game.use_case.StartNewGameInteractor;
 import framework.ui.EffectOverlayPanel;
 import framework.ui.MainFrame;
 import framework.ui.SwingUiScheduler;
-import java.awt.CardLayout;
-import java.awt.Component;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 /**
- * Wires the whole application: creates the shared view model, the presenters
- * and controllers for the three use cases, and the Swing view, mirroring the
- * AppBuilder in CAWithBuilder.
+ * Wires the whole application with one fluent method per frame and per use
+ * case, mirroring the AppBuilder in CAWithBuilder.
  */
 public class AppBuilder {
 
     private final GameViewModel gameViewModel = new GameViewModel();
+    private final SwingUiScheduler uiScheduler = new SwingUiScheduler();
 
-    public JFrame build() {
-        final SwingUiScheduler uiScheduler = new SwingUiScheduler();
+    private MainFrame frame;
+    private RequestAiMoveController requestAiMoveController;
 
-        final RequestAiMovePresenter requestAiMovePresenter =
-                new RequestAiMovePresenter(gameViewModel, uiScheduler);
-        final RequestAiMoveController requestAiMoveController = new RequestAiMoveController(
-                new RequestAiMoveInteractor(requestAiMovePresenter), gameViewModel, uiScheduler);
-
-        final MakeHumanMovePresenter makeHumanMovePresenter =
-                new MakeHumanMovePresenter(gameViewModel, requestAiMoveController::execute);
-        final MakeHumanMoveController makeHumanMoveController = new MakeHumanMoveController(
-                new MakeHumanMoveInteractor(makeHumanMovePresenter), gameViewModel);
-
-        final StartNewGamePresenter startNewGamePresenter =
-                new StartNewGamePresenter(gameViewModel);
-        final StartNewGameController startNewGameController = new StartNewGameController(
-                new StartNewGameInteractor(startNewGamePresenter),
-                new AiStrategyFactory(), gameViewModel);
-
-        final MainFrame frame = new MainFrame(gameViewModel);
-        frame.setControllers(startNewGameController, makeHumanMoveController);
+    public AppBuilder addGameView() {
+        frame = new MainFrame(gameViewModel);
 
         final EffectOverlayPanel effects = new EffectOverlayPanel();
         frame.setGlassPane(effects);
@@ -59,7 +40,37 @@ public class AppBuilder {
                 ifEnabled(frame.setupPanel()::isConfettiEffectEnabled, effects::playConfetti),
                 ifEnabled(frame.setupPanel()::isFireworksEffectEnabled, effects::playFireworks),
                 ifEnabled(frame.setupPanel()::isMarksEffectEnabled, effects::playMarks)));
+        return this;
+    }
 
+    public AppBuilder addRequestAiMoveUseCase() {
+        final RequestAiMovePresenter requestAiMovePresenter =
+                new RequestAiMovePresenter(gameViewModel, uiScheduler);
+        requestAiMoveController = new RequestAiMoveController(
+                new RequestAiMoveInteractor(requestAiMovePresenter), gameViewModel, uiScheduler);
+        return this;
+    }
+
+    public AppBuilder addMakeHumanMoveUseCase() {
+        final MakeHumanMovePresenter makeHumanMovePresenter =
+                new MakeHumanMovePresenter(gameViewModel, requestAiMoveController::execute);
+        final MakeHumanMoveController makeHumanMoveController = new MakeHumanMoveController(
+                new MakeHumanMoveInteractor(makeHumanMovePresenter), gameViewModel);
+        frame.setMakeHumanMoveController(makeHumanMoveController);
+        return this;
+    }
+
+    public AppBuilder addStartNewGameUseCase() {
+        final StartNewGamePresenter startNewGamePresenter =
+                new StartNewGamePresenter(gameViewModel);
+        final StartNewGameController startNewGameController = new StartNewGameController(
+                new StartNewGameInteractor(startNewGamePresenter),
+                new AiStrategyFactory(), gameViewModel);
+        frame.setStartNewGameController(startNewGameController);
+        return this;
+    }
+
+    public JFrame build() {
         return frame;
     }
 

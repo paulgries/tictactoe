@@ -71,12 +71,13 @@ public final class MainFrame extends JFrame implements PropertyChangeListener {
         gamePanel.setBackground(Theme.panelBackground());
     }
 
-    public void setControllers(
-            StartNewGameController startNewGameController,
-            MakeHumanMoveController makeHumanMoveController) {
+    public void setStartNewGameController(StartNewGameController startNewGameController) {
         setupPanel.setStartNewGameController(startNewGameController);
-        boardPanel.setMakeHumanMoveController(makeHumanMoveController);
         statusPanel.setStartNewGameController(startNewGameController);
+    }
+
+    public void setMakeHumanMoveController(MakeHumanMoveController makeHumanMoveController) {
+        boardPanel.setMakeHumanMoveController(makeHumanMoveController);
     }
 
     public void setWinEffects(List<Runnable> winEffects) {

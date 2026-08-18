@@ -52,7 +52,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.5.0</version>
                 <configuration>
-                    <mainClass>framework.Main</mainClass>
+                    <mainClass>app.Main</mainClass>
                 </configuration>
             </plugin>
         </plugins>
