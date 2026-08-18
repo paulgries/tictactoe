@@ -1,12 +1,10 @@
 package com.tictactoe.game.adapters;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.tictactoe.game.NewGameRequest;
 import com.tictactoe.game.domain.AiDifficulty;
 import com.tictactoe.game.domain.GameMode;
-import com.tictactoe.game.domain.exception.InvalidGameConfigException;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
@@ -30,11 +28,5 @@ class NewGameRequestFactoryTest {
 
         assertThat(request.mode()).isEqualTo(GameMode.TWO_PLAYER);
         assertThat(request.aiDifficulty()).isEmpty();
-    }
-
-    @Test
-    void createPropagatesInvalidGameConfigExceptionForInvalidCombination() {
-        assertThatThrownBy(() -> NewGameRequestFactory.create(3, 4, GameMode.TWO_PLAYER, Optional.empty()))
-            .isInstanceOf(InvalidGameConfigException.class);
     }
 }

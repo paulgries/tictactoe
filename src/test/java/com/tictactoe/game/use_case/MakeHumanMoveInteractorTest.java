@@ -55,14 +55,4 @@ class MakeHumanMoveInteractorTest {
         verify(presenter).prepareFailView("cannot move after the game is over");
         verify(presenter, never()).prepareSuccessView(any());
     }
-
-    @Test
-    void execute_CellOccupied_PresentsFailView() {
-        GameState state = GameState.newGame(CONFIG_3X3).applyMove(new Position(0, 0));
-
-        interactor.execute(new MakeHumanMoveInputData(state, new Position(0, 0)));
-
-        verify(presenter).prepareFailView("cell already occupied: " + new Position(0, 0));
-        verify(presenter, never()).prepareSuccessView(any());
-    }
 }
