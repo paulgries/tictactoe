@@ -9,6 +9,9 @@ repo-specific details) to carry the workflow forward.
   `chore`, `deps`, `docs`.
 - Concise subject; lowercase, no trailing period.
 - Body explains the "why" when it isn't obvious.
+- **Show the commit message to the user for approval before every commit.**
+  Stage the intended files first, then present the message (subject + body)
+  and wait for explicit approval; commit only after the user approves.
 
 ## Branching & PRs
 
