@@ -28,17 +28,31 @@ repo-specific details) to carry the workflow forward.
 - Structure: capability folder contains its `use_case` subpackage; layers live
   inside capabilities rather than top-level layers.
 - Example layout:
-  - `account/signup/use_case`
-  - `account/change_password/use_case`
-  - `authentication/login/use_case`
-  - `user/` (shared domain entity)
-  - `data_access/`, `framework/`, `app/`
+  - `game/` (shared presentation bean and view-model)
+  - `game/start_new_game/use_case`
+  - `game/make_human_move/use_case`
+  - `game/request_ai_move/use_case`
+  - `game/domain/` (shared domain model)
+  - `app/`, `framework/`
 - Build a `CommonUser`/`CommonUserFactory` style entity for domain models.
 - Each use case gets a boundary set under its `use_case` package:
   `InputBoundary`, `InputData`, `Interactor`, `OutputBoundary`, `OutputData`.
   Interactors are `void` and receive the `OutputBoundary` in their
-  constructor; adapter-side controllers implement the `OutputBoundary` and
-  wire the interactors internally.
+  constructor; the `OutputBoundary` is implemented by the capability's
+  **Presenter**, which updates the shared `GameViewModel`/`GameState` bean and
+  fires a PropertyChange; the `InputBoundary` is held by the capability's thin
+  **Controller**, which builds the `InputData` from view primitives.
+- View-state model: a `framework/ViewModel<T>` base plus a shared
+  presentation bean (`GameState`) holding both render data (board/status) and
+  session data (mode, AI strategy, stale-result base) that controllers and
+  presenters share across use cases; one `MainFrame` renders from it.
+- Wiring in `app/AppBuilder` (per-frame wiring methods); `Main` stays thin.
+- Controllers/presenters may inject a `UiScheduler` (`framework`) to move
+  work off the UI thread; stale background results are discarded by comparing
+  the session state against the base the result was computed from.
+- A one-frame presentation (`GameView`) or cross-cutting logic (win effects)
+  that only serves the frame belongs inside the frame itself (e.g. a
+  `Runnable` effect list on `MainFrame`), not in dedicated classes.
 
 ## Testing
 
@@ -53,7 +67,7 @@ repo-specific details) to carry the workflow forward.
   domain tests; drop tests that fully duplicate lower-layer coverage (one
   fail path suffices when cases share the same translation).
 - Extract repeated fixtures into a shared test helper
-  (e.g. `com.tictactoe.game.testutil.GameFixtures`) instead of duplicating
+  (e.g. `game.testutil.GameFixtures`) instead of duplicating
   board/state-building sequences in each test class.
 - Run `mvn clean test` — incremental compilation can report false positives.
   `mvn` output is the source of truth; ignore stale editor/LSP diagnostics
