@@ -87,4 +87,29 @@ class BoardTest {
         assertThat(board.emptyPositions())
             .containsExactly(new Position(0, 0), new Position(1, 0), new Position(1, 1));
     }
+
+    @Test
+    void boardsWithSameMarksInSamePlacesAreEqualAndHashEqual() {
+        Board a = new Board(3)
+            .placeMark(new Position(0, 0), Mark.X)
+            .placeMark(new Position(1, 1), Mark.O);
+        Board b = new Board(3)
+            .placeMark(new Position(0, 0), Mark.X)
+            .placeMark(new Position(1, 1), Mark.O);
+
+        assertThat(a).isEqualTo(b);
+        assertThat(a.hashCode()).isEqualTo(b.hashCode());
+    }
+
+    @Test
+    void boardsDifferingInMarksOrSizeAreNotEqual() {
+        Board withX = new Board(3).placeMark(new Position(0, 0), Mark.X);
+        Board withO = new Board(3).placeMark(new Position(0, 0), Mark.O);
+        Board empty = new Board(3);
+
+        assertThat(withX).isNotEqualTo(withO);
+        assertThat(withX).isNotEqualTo(empty);
+        assertThat(withX).isNotEqualTo(new Board(4));
+        assertThat(withX).isNotEqualTo(null);
+    }
 }

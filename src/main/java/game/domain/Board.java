@@ -2,7 +2,9 @@ package game.domain;
 
 import game.domain.exception.InvalidMoveException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public final class Board {
@@ -70,5 +72,23 @@ public final class Board {
         if (position.row() >= size || position.column() >= size) {
             throw new InvalidMoveException("position out of bounds: " + position);
         }
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof Board board)) {
+            return false;
+        }
+        return size == board.size && Arrays.deepEquals(cells, board.cells);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(size);
+        result = 31 * result + Arrays.deepHashCode(cells);
+        return result;
     }
 }
