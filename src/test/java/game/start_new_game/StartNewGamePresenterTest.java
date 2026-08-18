@@ -9,6 +9,7 @@ import game.GameViewModel;
 import game.domain.AiDifficulty;
 import game.domain.GameConfig;
 import game.domain.GameMode;
+import game.setup.SetupViewModel;
 import game.start_new_game.use_case.StartNewGameOutputData;
 import game.testutil.GameFixtures;
 import java.beans.PropertyChangeListener;
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.Test;
 class StartNewGamePresenterTest {
 
     private GameViewModel gameViewModel;
+    private SetupViewModel setupViewModel;
     private ViewManagerModel viewManagerModel;
     private StartNewGamePresenter presenter;
     private GameRenderState lastFiredState;
@@ -27,13 +29,14 @@ class StartNewGamePresenterTest {
     @BeforeEach
     void setUp() {
         gameViewModel = new GameViewModel();
+        setupViewModel = new SetupViewModel();
         viewManagerModel = new ViewManagerModel();
         PropertyChangeListener listener = evt -> {
             lastFiredState = (GameRenderState) evt.getNewValue();
             fireCount++;
         };
         gameViewModel.addPropertyChangeListener(listener);
-        presenter = new StartNewGamePresenter(gameViewModel, viewManagerModel, "setup");
+        presenter = new StartNewGamePresenter(gameViewModel, setupViewModel, viewManagerModel);
     }
 
     @Test
@@ -77,11 +80,11 @@ class StartNewGamePresenterTest {
     }
 
     @Test
-    void prepareFailView_SetsErrorAndFires() {
+    void prepareFailView_SetsMessageOnSetupViewModelAndFires() {
         presenter.prepareFailView("boom");
 
-        assertThat(gameViewModel.getState().getMessage()).isEqualTo("boom");
-        assertThat(fireCount).isEqualTo(1);
+        assertThat(setupViewModel.getState().getMessage()).isEqualTo("boom");
+        assertThat(fireCount).isZero();
         assertThat(viewManagerModel.getState()).isEmpty();
     }
 

@@ -1,8 +1,9 @@
-package framework.ui;
+package game.game_view;
 
-import game.BoardViewModel;
+import framework.Theme;
+import game.BoardRenderState;
+import game.CellRenderState;
 import game.CellSymbol;
-import game.CellViewModel;
 import game.GameOutcomeKind;
 import game.domain.Position;
 import game.make_human_move.MakeHumanMoveController;
@@ -28,7 +29,7 @@ public final class BoardPanel extends JPanel {
     private MakeHumanMoveController makeHumanMoveController;
     private final Map<Position, JButton> buttons = new HashMap<>();
     private int currentSize = -1;
-    private BoardViewModel lastRendered;
+    private BoardRenderState lastRendered;
 
     public BoardPanel() {
         Theme.addListener(this::applyTheme);
@@ -39,7 +40,7 @@ public final class BoardPanel extends JPanel {
         this.makeHumanMoveController = makeHumanMoveController;
     }
 
-    public void render(BoardViewModel board) {
+    public void render(BoardRenderState board) {
         if (board.size() != currentSize) {
             rebuildGrid(board.size());
         }
@@ -47,7 +48,7 @@ public final class BoardPanel extends JPanel {
 
         boolean gameOver = board.outcome() != GameOutcomeKind.IN_PROGRESS;
 
-        for (CellViewModel cell : board.cells()) {
+        for (CellRenderState cell : board.cells()) {
             JButton button = buttons.get(cell.position());
             button.setText(symbolText(cell.symbol()));
             button.setEnabled(cell.symbol() == CellSymbol.EMPTY && !gameOver);

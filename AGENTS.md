@@ -33,44 +33,61 @@ repo-specific details) to carry the workflow forward.
 - Structure: capability folder contains its `use_case` subpackage; layers live
   inside capabilities rather than top-level layers.
 - Example layout:
-  - `game/` (shared presentation bean and view-model)
+  - `game/` (shared presentation beans and view-models)
+  - `game/setup/` (setup screen view + `SetupViewModel`/`SetupState`)
+  - `game/game_view/` (game screen view: `GamePanel`, board/status panels,
+    win-effect overlay)
   - `game/start_new_game/use_case`
   - `game/make_human_move/use_case`
   - `game/request_ai_move/use_case`
   - `game/save_game/use_case` (persistence boundary: `SaveGameDataAccess`)
   - `game/load_game/use_case` (persistence boundary: `LoadGameDataAccess`)
   - `game/domain/` (shared domain model, incl. `SavedGame` snapshot)
-  - `app/`, `framework/`
+  - `app/` (`Main`, `AppBuilder`, window shell `MainFrame`), `framework/`
+    (generic, reusable: `ViewModel`, `ViewManagerModel`, `ViewManager`,
+    `UiScheduler`/`SwingUiScheduler`, `Theme`, `storage/`)
 - Build a `CommonUser`/`CommonUserFactory` style entity for domain models.
 - Each use case gets a boundary set under its `use_case` package:
   `InputBoundary`, `InputData`, `Interactor`, `OutputBoundary`, `OutputData`.
   Interactors are `void` and receive the `OutputBoundary` in their
   constructor; the `OutputBoundary` is implemented by the capability's
-  **Presenter**, which updates the shared `GameViewModel` state and
+  **Presenter**, which updates the shared view model state and
   fires a PropertyChange; the `InputBoundary` is held by the capability's thin
   **Controller**, which builds the `InputData` from view primitives.
-- View-state model: a `framework/ViewModel<T>` base plus a view model
-  holding two separate states — a `SessionState` (current domain state,
-  mode, AI difficulty) that controllers and presenters share across use
-  cases, and a `GameRenderState` (board/status/message) that the frame renders
-  from.
-  Presenters update both and fire one property change; one `MainFrame`
-  renders from it. Presentation-side rules shared by several use cases (e.g.
-  "is the AI to move?") live in a small static helper (`GameSessionRules`),
-  not on the state beans, which stay dumb.
+- View-model pattern (CAWithBuilder): one `ViewModel<T>` per view; beans are
+  named `XxxState`, view models `XxxViewModel`, and views bind to their view
+  model (register as a PropertyChangeListener and render from
+  `evt.getNewValue()`). `ViewModel` fires with a default `"state"` property
+  name or a caller-chosen one (`firePropertyChanged(String)`).
+  - `SetupViewModel`/`SetupState` hold the setup screen's inputs; the panel
+    writes widget values into the state as they change and the controller
+    reads from it on Start; presenters put transient messages (e.g. invalid
+    config, no saved game) in the state and the panel shows them.
+  - `GameViewModel` holds two separate states shared across the game use
+    cases — a `SessionState` (current domain state, mode, AI difficulty)
+    that controllers and presenters share, and a `GameRenderState`
+    (board/status/message) that the game view renders from. Presenters
+    update both and fire one property change; `GamePanel` renders from it
+    and shows the message dialog. Presentation-side rules shared by several
+    use cases (e.g. "is the AI to move?") live in a small static helper
+    (`GameSessionRules`), not on the state beans, which stay dumb.
 - Navigation is presenter-driven: a `framework/ViewManager` +
   `ViewManagerModel` (`extends ViewModel<String>`) switches the card layout,
   presenters navigate by setting the view name (e.g. on success), and pure
   screen switches go through the boundaries as a second method
   (`switchToSetupView`, like CAWithBuilder's `switchToLoginView`). Card
-  names come from `getViewName()` on the views.
-- Wiring in `app/AppBuilder` (per-frame wiring methods); `Main` stays thin.
+  names come from `getViewName()` on the views (delegating to their view
+  models).
+- Wiring in `app/AppBuilder` (one fluent method per view and per use case;
+  views are registered on the window's card panel under their view name,
+  like CAWithBuilder's `addXxxView()`); `Main` stays thin. The window shell
+  `app/MainFrame` knows nothing about the game.
 - Controllers/presenters may inject a `UiScheduler` (`framework`) to move
   work off the UI thread; stale background results are discarded by comparing
   the session state against the base the result was computed from.
-- A one-frame presentation (`GameView`) or cross-cutting logic (win effects)
-  that only serves the frame belongs inside the frame itself (e.g. a
-  `Runnable` effect list on `MainFrame`), not in dedicated classes.
+- A one-frame presentation or cross-cutting logic (win effects) that only
+  serves the game screen belongs inside the game view (`GamePanel`, e.g. a
+  `Runnable` effect list), not in dedicated classes.
 
 ## Testing
 

@@ -1,11 +1,14 @@
-package framework.ui;
+package game.setup;
 
+import framework.Theme;
 import game.domain.AiDifficulty;
 import game.domain.GameMode;
 import game.load_game.LoadGameController;
 import game.start_new_game.StartNewGameController;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,17 +18,24 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-public final class SetupPanel extends JPanel {
-
-    public static final String VIEW_NAME = "setup";
+/**
+ * The view for the setup screen, following the CAWithBuilder pattern: it
+ * binds to its {@link SetupViewModel}, writes the widgets' values into the
+ * {@link SetupState} as the player changes them, and shows transient
+ * messages (e.g. an invalid configuration) that presenters put in the state.
+ * Only the night-mode toggle is handled directly, since the theme is global.
+ */
+public final class SetupPanel extends JPanel implements PropertyChangeListener {
 
     private static final int START_BUTTON_OUTLINE_THICKNESS = 3;
 
+    private final SetupViewModel setupViewModel;
     private StartNewGameController startNewGameController;
     private LoadGameController loadGameController;
 
@@ -43,7 +53,9 @@ public final class SetupPanel extends JPanel {
     private final JPanel startButtonOutline = new JPanel(new BorderLayout());
     private final List<JLabel> labels = new ArrayList<>();
 
-    public SetupPanel() {
+    public SetupPanel(SetupViewModel setupViewModel) {
+        this.setupViewModel = setupViewModel;
+        setupViewModel.addPropertyChangeListener(this);
         setLayout(new GridLayout(0, 2, 8, 8));
 
         ButtonGroup modeGroup = new ButtonGroup();
@@ -51,10 +63,27 @@ public final class SetupPanel extends JPanel {
         modeGroup.add(vsComputerButton);
 
         difficultyBox.setEnabled(false);
-        twoPlayerButton.addItemListener(e -> difficultyBox.setEnabled(vsComputerButton.isSelected()));
-        vsComputerButton.addItemListener(e -> difficultyBox.setEnabled(vsComputerButton.isSelected()));
+        twoPlayerButton.addItemListener(e -> onModeChanged());
+        vsComputerButton.addItemListener(e -> onModeChanged());
 
-        boardSizeSpinner.addChangeListener(e -> clampWinLengthToBoardSize());
+        boardSizeSpinner.addChangeListener(e -> {
+            clampWinLengthToBoardSize();
+            setupViewModel.getState().setBoardSize((Integer) boardSizeSpinner.getValue());
+        });
+        winLengthSpinner.addChangeListener(e ->
+            setupViewModel.getState().setWinLength((Integer) winLengthSpinner.getValue()));
+        difficultyBox.addItemListener(e ->
+            setupViewModel.getState().setDifficulty(
+                vsComputerButton.isSelected()
+                    ? Optional.of((AiDifficulty) difficultyBox.getSelectedItem())
+                    : Optional.empty()));
+
+        confettiCheckBox.addItemListener(e ->
+            setupViewModel.getState().setConfettiEnabled(confettiCheckBox.isSelected()));
+        fireworksCheckBox.addItemListener(e ->
+            setupViewModel.getState().setFireworksEnabled(fireworksCheckBox.isSelected()));
+        marksCheckBox.addItemListener(e ->
+            setupViewModel.getState().setMarksEnabled(marksCheckBox.isSelected()));
 
         nightModeCheckBox.addItemListener(
             e -> Theme.setMode(nightModeCheckBox.isSelected() ? Theme.Mode.NIGHT : Theme.Mode.DAY));
@@ -120,19 +149,28 @@ public final class SetupPanel extends JPanel {
     }
 
     public String getViewName() {
-        return VIEW_NAME;
+        return setupViewModel.getViewName();
     }
 
-    public boolean isConfettiEffectEnabled() {
-        return confettiCheckBox.isSelected();
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        final SetupState state = setupViewModel.getState();
+        if (state.getMessage() != null) {
+            String message = state.getMessage();
+            state.setMessage(null);
+            JOptionPane.showMessageDialog(
+                this, message, "Tic-Tac-Toe", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
-    public boolean isFireworksEffectEnabled() {
-        return fireworksCheckBox.isSelected();
-    }
-
-    public boolean isMarksEffectEnabled() {
-        return marksCheckBox.isSelected();
+    private void onModeChanged() {
+        boolean vsComputer = vsComputerButton.isSelected();
+        difficultyBox.setEnabled(vsComputer);
+        final SetupState state = setupViewModel.getState();
+        state.setMode(vsComputer ? GameMode.HUMAN_VS_AI : GameMode.TWO_PLAYER);
+        state.setDifficulty(vsComputer
+            ? Optional.of((AiDifficulty) difficultyBox.getSelectedItem())
+            : Optional.empty());
     }
 
     private void clampWinLengthToBoardSize() {
@@ -145,13 +183,8 @@ public final class SetupPanel extends JPanel {
     }
 
     private void onStartClicked() {
-        int boardSize = (Integer) boardSizeSpinner.getValue();
-        int winLength = (Integer) winLengthSpinner.getValue();
-        GameMode mode = vsComputerButton.isSelected() ? GameMode.HUMAN_VS_AI : GameMode.TWO_PLAYER;
-        Optional<AiDifficulty> difficulty = mode == GameMode.HUMAN_VS_AI
-            ? Optional.of((AiDifficulty) difficultyBox.getSelectedItem())
-            : Optional.empty();
-
-        startNewGameController.execute(boardSize, winLength, mode, difficulty);
+        final SetupState state = setupViewModel.getState();
+        startNewGameController.execute(
+            state.getBoardSize(), state.getWinLength(), state.getMode(), state.getDifficulty());
     }
 }

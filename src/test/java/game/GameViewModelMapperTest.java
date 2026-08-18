@@ -2,10 +2,10 @@ package game;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import game.BoardViewModel;
+import game.BoardRenderState;
 import game.CellSymbol;
 import game.GameOutcomeKind;
-import game.StatusViewModel;
+import game.StatusRenderState;
 import game.domain.GameConfig;
 import game.domain.GameState;
 import game.domain.Position;
@@ -17,10 +17,10 @@ class GameViewModelMapperTest {
     private static final GameConfig CONFIG_3X3 = new GameConfig(3, 3);
 
     @Test
-    void toBoardViewModelReflectsSizeCellsAndInProgressOutcomeOnEmptyBoard() {
+    void toBoardRenderStateReflectsSizeCellsAndInProgressOutcomeOnEmptyBoard() {
         GameState state = GameState.newGame(CONFIG_3X3);
 
-        BoardViewModel board = GameViewModelMapper.toBoardViewModel(state);
+        BoardRenderState board = GameViewModelMapper.toBoardRenderState(state);
 
         assertThat(board.size()).isEqualTo(3);
         assertThat(board.cells()).hasSize(9);
@@ -30,10 +30,10 @@ class GameViewModelMapperTest {
     }
 
     @Test
-    void toBoardViewModelIncludesWinningLineAndWinOutcomeWhenWon() {
+    void toBoardRenderStateIncludesWinningLineAndWinOutcomeWhenWon() {
         GameState state = GameFixtures.wonByX();
 
-        BoardViewModel board = GameViewModelMapper.toBoardViewModel(state);
+        BoardRenderState board = GameViewModelMapper.toBoardRenderState(state);
 
         assertThat(board.outcome()).isEqualTo(GameOutcomeKind.WIN);
         assertThat(board.winningLine()).containsExactlyInAnyOrder(
@@ -41,30 +41,30 @@ class GameViewModelMapperTest {
     }
 
     @Test
-    void toBoardViewModelHasDrawOutcomeAndNoWinningLineWhenDrawn() {
+    void toBoardRenderStateHasDrawOutcomeAndNoWinningLineWhenDrawn() {
         GameState state = GameFixtures.drawn();
 
-        BoardViewModel board = GameViewModelMapper.toBoardViewModel(state);
+        BoardRenderState board = GameViewModelMapper.toBoardRenderState(state);
 
         assertThat(board.outcome()).isEqualTo(GameOutcomeKind.DRAW);
         assertThat(board.winningLine()).isEmpty();
     }
 
     @Test
-    void toStatusViewModelReflectsCurrentTurnWhenInProgress() {
+    void toStatusRenderStateReflectsCurrentTurnWhenInProgress() {
         GameState state = GameState.newGame(CONFIG_3X3);
 
-        StatusViewModel status = GameViewModelMapper.toStatusViewModel(state);
+        StatusRenderState status = GameViewModelMapper.toStatusRenderState(state);
 
         assertThat(status.kind()).isEqualTo(GameOutcomeKind.IN_PROGRESS);
         assertThat(status.message()).contains("X");
     }
 
     @Test
-    void toStatusViewModelReflectsWinnerWhenWon() {
+    void toStatusRenderStateReflectsWinnerWhenWon() {
         GameState state = GameFixtures.wonByX();
 
-        StatusViewModel status = GameViewModelMapper.toStatusViewModel(state);
+        StatusRenderState status = GameViewModelMapper.toStatusRenderState(state);
 
         assertThat(status.kind()).isEqualTo(GameOutcomeKind.WIN);
         assertThat(status.message()).contains("X");

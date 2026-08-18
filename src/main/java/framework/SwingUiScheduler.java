@@ -1,4 +1,4 @@
-package framework.ui;
+package framework;
 
 import framework.UiScheduler;
 import java.util.concurrent.ExecutorService;

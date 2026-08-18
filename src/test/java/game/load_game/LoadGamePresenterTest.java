@@ -10,6 +10,7 @@ import game.domain.AiDifficulty;
 import game.domain.GameMode;
 import game.domain.SavedGame;
 import game.load_game.use_case.LoadGameOutputData;
+import game.setup.SetupViewModel;
 import game.testutil.GameFixtures;
 import java.beans.PropertyChangeListener;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.Test;
 class LoadGamePresenterTest {
 
     private GameViewModel gameViewModel;
+    private SetupViewModel setupViewModel;
     private ViewManagerModel viewManagerModel;
     private LoadGamePresenter presenter;
     private GameRenderState lastFiredState;
@@ -27,13 +29,14 @@ class LoadGamePresenterTest {
     @BeforeEach
     void setUp() {
         gameViewModel = new GameViewModel();
+        setupViewModel = new SetupViewModel();
         viewManagerModel = new ViewManagerModel();
         PropertyChangeListener listener = evt -> {
             lastFiredState = (GameRenderState) evt.getNewValue();
             fireCount++;
         };
         gameViewModel.addPropertyChangeListener(listener);
-        presenter = new LoadGamePresenter(gameViewModel, viewManagerModel);
+        presenter = new LoadGamePresenter(gameViewModel, setupViewModel, viewManagerModel);
     }
 
     @Test
@@ -57,11 +60,11 @@ class LoadGamePresenterTest {
     }
 
     @Test
-    void prepareFailView_SetsMessageAndDoesNotNavigate() {
+    void prepareFailView_SetsMessageOnSetupViewModelAndDoesNotNavigate() {
         presenter.prepareFailView("no saved game found");
 
-        assertThat(gameViewModel.getState().getMessage()).isEqualTo("no saved game found");
-        assertThat(fireCount).isEqualTo(1);
+        assertThat(setupViewModel.getState().getMessage()).isEqualTo("no saved game found");
+        assertThat(fireCount).isZero();
         assertThat(viewManagerModel.getState()).isEmpty();
     }
 }

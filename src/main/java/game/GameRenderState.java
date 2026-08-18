@@ -7,23 +7,23 @@ package game;
  */
 public class GameRenderState {
 
-    private BoardViewModel board;
-    private StatusViewModel status;
+    private BoardRenderState board;
+    private StatusRenderState status;
     private String message;
 
-    public BoardViewModel getBoard() {
+    public BoardRenderState getBoard() {
         return board;
     }
 
-    public void setBoard(BoardViewModel board) {
+    public void setBoard(BoardRenderState board) {
         this.board = board;
     }
 
-    public StatusViewModel getStatus() {
+    public StatusRenderState getStatus() {
         return status;
     }
 
-    public void setStatus(StatusViewModel status) {
+    public void setStatus(StatusRenderState status) {
         this.status = status;
     }
 

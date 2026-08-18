@@ -1,4 +1,4 @@
-package framework.ui;
+package framework;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -15,9 +15,9 @@ import javax.swing.JButton;
  * some look-and-feels (notably Aqua) silently ignore the custom background and keep
  * painting their native chrome.
  */
-final class Theme {
+public final class Theme {
 
-    enum Mode { DAY, NIGHT }
+    public enum Mode { DAY, NIGHT }
 
     private static final Color DAY_PANEL_BACKGROUND = new Color(0xEC, 0xEC, 0xEC);
     private static final Color DAY_BUTTON_BACKGROUND = new Color(0xF0, 0xF0, 0xF0);
@@ -34,32 +34,32 @@ final class Theme {
     private Theme() {
     }
 
-    static Mode mode() {
+    public static Mode mode() {
         return mode;
     }
 
-    static void setMode(Mode newMode) {
+    public static void setMode(Mode newMode) {
         mode = newMode;
         listeners.forEach(Runnable::run);
     }
 
-    static void addListener(Runnable listener) {
+    public static void addListener(Runnable listener) {
         listeners.add(listener);
     }
 
-    static Color panelBackground() {
+    public static Color panelBackground() {
         return mode == Mode.NIGHT ? NIGHT_PANEL_BACKGROUND : DAY_PANEL_BACKGROUND;
     }
 
-    static Color buttonBackground() {
+    public static Color buttonBackground() {
         return mode == Mode.NIGHT ? NIGHT_BUTTON_BACKGROUND : DAY_BUTTON_BACKGROUND;
     }
 
-    static Color textColor() {
+    public static Color textColor() {
         return mode == Mode.NIGHT ? NIGHT_TEXT_COLOR : DAY_TEXT_COLOR;
     }
 
-    static void styleButton(JButton button) {
+    public static void styleButton(JButton button) {
         button.setBackground(buttonBackground());
         button.setForeground(textColor());
         button.setOpaque(true);

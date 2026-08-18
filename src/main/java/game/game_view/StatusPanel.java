@@ -1,6 +1,7 @@
-package framework.ui;
+package game.game_view;
 
-import game.StatusViewModel;
+import framework.Theme;
+import game.StatusRenderState;
 import game.save_game.SaveGameController;
 import game.start_new_game.StartNewGameController;
 import java.awt.BorderLayout;
@@ -54,7 +55,7 @@ public final class StatusPanel extends JPanel {
         this.saveGameController = saveGameController;
     }
 
-    public void render(StatusViewModel status) {
+    public void render(StatusRenderState status) {
         statusLabel.setText(status.message());
     }
 }

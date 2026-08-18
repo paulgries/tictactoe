@@ -29,8 +29,8 @@ public class MakeHumanMovePresenter implements MakeHumanMoveOutputBoundary {
         final SessionState session = gameViewModel.getSession();
         session.setCurrentGameState(outputData.updatedState());
         final GameRenderState render = gameViewModel.getState();
-        render.setBoard(GameViewModelMapper.toBoardViewModel(outputData.updatedState()));
-        render.setStatus(GameViewModelMapper.toStatusViewModel(outputData.updatedState()));
+        render.setBoard(GameViewModelMapper.toBoardRenderState(outputData.updatedState()));
+        render.setStatus(GameViewModelMapper.toStatusRenderState(outputData.updatedState()));
         render.setMessage(null);
         gameViewModel.firePropertyChanged();
 

@@ -1,10 +1,10 @@
 package game;
 
-import game.BoardViewModel;
+import game.BoardRenderState;
 import game.CellSymbol;
-import game.CellViewModel;
+import game.CellRenderState;
 import game.GameOutcomeKind;
-import game.StatusViewModel;
+import game.StatusRenderState;
 import game.domain.Draw;
 import game.domain.GameState;
 import game.domain.Mark;
@@ -18,25 +18,25 @@ public final class GameViewModelMapper {
     private GameViewModelMapper() {
     }
 
-    public static BoardViewModel toBoardViewModel(GameState state) {
+    public static BoardRenderState toBoardRenderState(GameState state) {
         int size = state.config().boardSize();
-        List<CellViewModel> cells = new ArrayList<>(size * size);
+        List<CellRenderState> cells = new ArrayList<>(size * size);
         for (int row = 0; row < size; row++) {
             for (int column = 0; column < size; column++) {
                 Position position = new Position(row, column);
                 CellSymbol symbol = state.board().get(position)
                     .map(mark -> mark == Mark.X ? CellSymbol.X : CellSymbol.O)
                     .orElse(CellSymbol.EMPTY);
-                cells.add(new CellViewModel(position, symbol));
+                cells.add(new CellRenderState(position, symbol));
             }
         }
         List<Position> winningLine = state.status() instanceof Win win
             ? win.winningLine()
             : List.of();
-        return new BoardViewModel(size, cells, winningLine, outcomeKindOf(state));
+        return new BoardRenderState(size, cells, winningLine, outcomeKindOf(state));
     }
 
-    public static StatusViewModel toStatusViewModel(GameState state) {
+    public static StatusRenderState toStatusRenderState(GameState state) {
         String message;
         if (state.status() instanceof Win win) {
             message = win.winner() + " wins!";
@@ -45,7 +45,7 @@ public final class GameViewModelMapper {
         } else {
             message = state.currentTurn() + "'s turn";
         }
-        return new StatusViewModel(message, outcomeKindOf(state));
+        return new StatusRenderState(message, outcomeKindOf(state));
     }
 
     private static GameOutcomeKind outcomeKindOf(GameState state) {

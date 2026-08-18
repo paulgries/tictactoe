@@ -5,29 +5,31 @@ import game.GameRenderState;
 import game.GameViewModel;
 import game.GameViewModelMapper;
 import game.SessionState;
+import game.setup.SetupViewModel;
 import game.start_new_game.use_case.StartNewGameOutputBoundary;
 import game.start_new_game.use_case.StartNewGameOutputData;
 
 /**
  * The Presenter for the Start New Game Use Case. Stashes the session data
- * (mode and AI difficulty) in the shared view model, updates the render
- * state, and fires a property change so the view re-renders. Navigation is
+ * (mode and AI difficulty) in the shared game view model, updates the render
+ * state, and fires a property change so the game view re-renders. Failures
+ * go to the setup view model, whose view shows them. Navigation is
  * presenter-driven through the {@link ViewManagerModel}, as in
  * CAWithBuilder.
  */
 public class StartNewGamePresenter implements StartNewGameOutputBoundary {
 
     private final GameViewModel gameViewModel;
+    private final SetupViewModel setupViewModel;
     private final ViewManagerModel viewManagerModel;
-    private final String setupViewName;
 
     public StartNewGamePresenter(
             GameViewModel gameViewModel,
-            ViewManagerModel viewManagerModel,
-            String setupViewName) {
+            SetupViewModel setupViewModel,
+            ViewManagerModel viewManagerModel) {
         this.gameViewModel = gameViewModel;
+        this.setupViewModel = setupViewModel;
         this.viewManagerModel = viewManagerModel;
-        this.setupViewName = setupViewName;
     }
 
     @Override
@@ -37,8 +39,8 @@ public class StartNewGamePresenter implements StartNewGameOutputBoundary {
         session.setMode(outputData.mode());
         session.setDifficulty(outputData.difficulty());
         final GameRenderState render = gameViewModel.getState();
-        render.setBoard(GameViewModelMapper.toBoardViewModel(outputData.gameState()));
-        render.setStatus(GameViewModelMapper.toStatusViewModel(outputData.gameState()));
+        render.setBoard(GameViewModelMapper.toBoardRenderState(outputData.gameState()));
+        render.setStatus(GameViewModelMapper.toStatusRenderState(outputData.gameState()));
         render.setMessage(null);
         gameViewModel.firePropertyChanged();
 
@@ -48,13 +50,13 @@ public class StartNewGamePresenter implements StartNewGameOutputBoundary {
 
     @Override
     public void prepareFailView(String error) {
-        gameViewModel.getState().setMessage(error);
-        gameViewModel.firePropertyChanged();
+        setupViewModel.getState().setMessage(error);
+        setupViewModel.firePropertyChanged();
     }
 
     @Override
     public void switchToSetupView() {
-        viewManagerModel.setState(setupViewName);
+        viewManagerModel.setState(setupViewModel.getViewName());
         viewManagerModel.firePropertyChanged();
     }
 }

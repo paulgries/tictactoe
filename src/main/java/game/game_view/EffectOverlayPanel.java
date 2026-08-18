@@ -1,4 +1,4 @@
-package framework.ui;
+package game.game_view;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
