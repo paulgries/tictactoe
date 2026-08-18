@@ -1,0 +1,72 @@
+package com.tictactoe.game.use_case;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
+import com.tictactoe.game.domain.GameConfig;
+import com.tictactoe.game.domain.GameState;
+import com.tictactoe.game.domain.Mark;
+import com.tictactoe.game.domain.Position;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
+class MakeHumanMoveInteractorTest {
+
+    private static final GameConfig CONFIG_3X3 = new GameConfig(3, 3);
+
+    @Mock
+    private MakeHumanMoveOutputBoundary presenter;
+
+    private MakeHumanMoveInteractor interactor;
+
+    @BeforeEach
+    void setUp() {
+        interactor = new MakeHumanMoveInteractor(presenter);
+    }
+
+    @Test
+    void execute_ValidMove_PresentsUpdatedState() {
+        GameState state = GameState.newGame(CONFIG_3X3);
+
+        interactor.execute(new MakeHumanMoveInputData(state, new Position(0, 0)));
+
+        ArgumentCaptor<MakeHumanMoveOutputData> captor =
+            ArgumentCaptor.forClass(MakeHumanMoveOutputData.class);
+        verify(presenter).prepareSuccessView(captor.capture());
+        assertThat(captor.getValue().updatedState().board().get(new Position(0, 0))).contains(Mark.X);
+        assertThat(captor.getValue().updatedState().currentTurn()).isEqualTo(Mark.O);
+        verify(presenter, never()).prepareFailView(any());
+    }
+
+    @Test
+    void execute_GameAlreadyOver_PresentsFailView() {
+        GameState state = GameState.newGame(CONFIG_3X3)
+            .applyMove(new Position(0, 0)) // X
+            .applyMove(new Position(1, 0)) // O
+            .applyMove(new Position(0, 1)) // X
+            .applyMove(new Position(1, 1)) // O
+            .applyMove(new Position(0, 2)); // X wins
+
+        interactor.execute(new MakeHumanMoveInputData(state, new Position(2, 2)));
+
+        verify(presenter).prepareFailView("cannot move after the game is over");
+        verify(presenter, never()).prepareSuccessView(any());
+    }
+
+    @Test
+    void execute_CellOccupied_PresentsFailView() {
+        GameState state = GameState.newGame(CONFIG_3X3).applyMove(new Position(0, 0));
+
+        interactor.execute(new MakeHumanMoveInputData(state, new Position(0, 0)));
+
+        verify(presenter).prepareFailView("cell already occupied: " + new Position(0, 0));
+        verify(presenter, never()).prepareSuccessView(any());
+    }
+}

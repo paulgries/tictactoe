@@ -37,7 +37,7 @@ class GameControllerBuilderTest {
     }
 
     @Test
-    void buildWithOnlyRequiredDependenciesDefaultsTheUseCasesAndFactory() {
+    void buildWithOnlyRequiredDependenciesWiresTheUseCasesAndFactory() {
         GameView view = mock(GameView.class);
         UiScheduler scheduler = mock(UiScheduler.class);
 
