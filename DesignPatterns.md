@@ -7,11 +7,14 @@ definition). It's written for software design students who want to see
 these patterns in a small, complete, real system rather than an isolated
 toy example.
 
-The codebase follows Clean Architecture (see `CLAUDE.md`): `domain` →
-`application` → `adapters` → `infra`, with dependencies only ever pointing
-inward. Several of the patterns below exist specifically *because of* that
-constraint — for example, `Adapter` is how the inner layers stay ignorant
-of Swing.
+The codebase follows Clean Architecture (see `AGENTS.md`): a `game` engine
+(`game/domain` plus `game/ai`) sits at the center, the capabilities
+(`setup/`, `play/`, `persistence/`) each hold their own controllers,
+presenters, and `use_case` packages around it, and `data_access`,
+`framework`, and `app` sit at the edges. Dependencies only ever point
+inward toward `game/domain`. Several of the patterns below exist
+specifically *because of* that constraint — for example, `Adapter` is how
+the inner layers stay ignorant of Swing and of the file system.
 
 Patterns are grouped by GoF category, followed by a section on
 architectural idioms that show up alongside them.
@@ -27,24 +30,31 @@ behind a single method, so callers depend on an abstraction instead of a
 list of constructors.
 
 **Where:**
-- [`AiStrategyFactory.create(AiDifficulty)`](src/main/java/com/tictactoe/application/AiStrategyFactory.java)
-- [`NewGameRequestFactory.create(...)`](src/main/java/com/tictactoe/adapters/NewGameRequestFactory.java)
-- [`GameState.newGame(GameConfig)`](src/main/java/com/tictactoe/domain/GameState.java) — a *static factory method* (Effective Java, Item 1), a lighter cousin of the full Factory Method pattern: an alternative named constructor rather than a class whose whole job is choosing between subtypes.
+- [`AiStrategyFactory`](src/main/java/game/ai/AiStrategyFactory.java) (interface) + [`CommonAiStrategyFactory`](src/main/java/game/ai/CommonAiStrategyFactory.java) (implementation) — a *registry* factory mapping each `AiDifficulty` to a `Supplier<AiStrategy>`
+- [`GameStateFactory`](src/main/java/game/domain/GameStateFactory.java) (interface) + [`CommonGameStateFactory`](src/main/java/game/domain/CommonGameStateFactory.java) (implementation) — builds the `GameState` aggregate, injected into the `start_new_game` interactor the way CAWithBuilder injects `CommonUserFactory`
+- [`GameState.newGame(GameConfig)`](src/main/java/game/domain/GameState.java#L11) — a *static factory method* (Effective Java, Item 1), a lighter cousin of the full Factory Method pattern: an alternative named constructor rather than a class whose whole job is choosing between subtypes.
 
 ```java
-public AiStrategy create(AiDifficulty difficulty) {
-    return switch (difficulty) {
-        case EASY -> new RandomAiStrategy(new Random());
-        case MEDIUM -> new EasyAiStrategy();
-        case DIFFICULT -> new MinimaxAiStrategy();
-    };
+public final class CommonAiStrategyFactory implements AiStrategyFactory {
+    private final Map<AiDifficulty, Supplier<AiStrategy>> strategies =
+            new EnumMap<>(AiDifficulty.class);
+
+    public CommonAiStrategyFactory() {
+        register(AiDifficulty.EASY, () -> new RandomAiStrategy(new Random()));
+        register(AiDifficulty.MEDIUM, EasyAiStrategy::new);
+        register(AiDifficulty.DIFFICULT, MinimaxAiStrategy::new);
+    }
+    ...
 }
 ```
 
-`AiStrategyFactory` is the clearest example: `GameController` never
-constructs an `AiStrategy` implementation directly — it asks the factory
-for one given an `AiDifficulty`, so adding a fourth difficulty later means
-touching one `switch` expression instead of every call site.
+`CommonAiStrategyFactory` is the clearest example: the
+[`RequestAiMoveInteractor`](src/main/java/play/request_ai_move/use_case/RequestAiMoveInteractor.java)
+never constructs an `AiStrategy` implementation directly — it asks the
+factory for one given an `AiDifficulty`, so adding a fourth difficulty later
+means registering one more `Supplier` instead of touching every call site.
+The registry also lets tests substitute strategies or add custom ones
+without touching the factory's constructor.
 
 ---
 
@@ -54,27 +64,33 @@ touching one `switch` expression instead of every call site.
 representation, especially when it has several dependencies, some
 optional, that would otherwise force a long or repeated constructor call.
 
-**Where:** [`GameControllerBuilder`](src/main/java/com/tictactoe/adapters/GameControllerBuilder.java)
+**Where:** [`AppBuilder`](src/main/java/app/AppBuilder.java)
 
 ```java
-GameController controller = new GameControllerBuilder()
-    .view(frame)
-    .uiScheduler(new SwingUiScheduler())
-    .build();
+JFrame application = new AppBuilder()
+        .addSetupView()
+        .addGameView()
+        .addRequestAiMoveUseCase()
+        .addMakeHumanMoveUseCase()
+        .addStartNewGameUseCase()
+        .addSaveGameUseCase()
+        .addLoadGameUseCase()
+        .build();
 ```
 
-`GameController` has six dependencies. Two of them — the `GameView` and
-the `UiScheduler` — are delivery-mechanism specifics with no sensible
-default and are required. The other four (`StartNewGameUseCase`,
-`MakeHumanMoveUseCase`, `RequestAiMoveUseCase`, `AiStrategyFactory`) are
-stateless and identical for every caller, so the builder defaults them
-and only tests need to override one. This is why the pattern earns its
-keep here: both [`Main.java`](src/main/java/com/tictactoe/infra/Main.java)
-(production) and
-[`GameControllerTest`](src/test/java/com/tictactoe/adapters/GameControllerTest.java)
-(tests) share the same assembly path instead of duplicating a
-six-argument constructor call, only varying the one or two fields each
-caller actually cares about.
+The whole application graph has one shared `GameViewModel`,
+`SetupViewModel`, `ViewManagerModel`, `GameSessionDataAccess` (an
+`InMemoryGameSession`), and file DAO that must be threaded through every
+interactor and controller. Each use case also has an *ordering*
+constraint — `addMakeHumanMoveUseCase()` throws unless the request-AI-move
+use case was wired first, because the human-move presenter hands off to it.
+`AppBuilder`'s one-fluent-method-per-use-case shape (mirroring
+CAWithBuilder) keeps that assembly in a single readable place, and both
+[`Main.java`](src/main/java/app/Main.java) (production) and tests share the
+same path instead of repeating the wiring. This is exactly why the pattern
+earns its keep here: no single object is hard to build, but the *whole
+graph* is, and the builder makes the ordering constraints impossible to
+get subtly wrong.
 
 ---
 
@@ -82,32 +98,39 @@ caller actually cares about.
 
 ### Decorator
 
-**Intent:** Attach additional behavior to an object dynamically by
-wrapping it in another object that implements the same interface, so
-behaviors can be layered and composed without subclassing every
-combination.
+**Intent:** Attach additional behavior to an object dynamically by wrapping
+it in another object that implements the same interface, so behaviors can
+be layered and composed without subclassing every combination.
 
 **Where:**
-- [`GameViewDecorator`](src/main/java/com/tictactoe/adapters/GameViewDecorator.java) — abstract base that forwards every `GameView` call to a wrapped delegate.
-- [`WinEffectGameView`](src/main/java/com/tictactoe/adapters/WinEffectGameView.java) — concrete decorator that runs an extra `Runnable` whenever the status becomes a `WIN`.
-- Wired together in [`Main.java`](src/main/java/com/tictactoe/infra/Main.java)
+- [`GamePanel`](src/main/java/play/GamePanel.java) holds a `List<Runnable> winEffects` and runs every effect when the status becomes a `WIN` ([`GamePanel.java#L77-L79`](src/main/java/play/GamePanel.java#L77-L79)).
+- [`AppBuilder.ifEnabled(...)`](src/main/java/app/AppBuilder.java#L142-L148) — a *functional* decorator that wraps a `Runnable` and adds the "only run if enabled" behavior.
+- The effects themselves live in [`EffectOverlayPanel`](src/main/java/play/EffectOverlayPanel.java) (`playConfetti`, `playFireworks`, `playMarks`).
 
 ```java
-GameView celebratingView = new WinEffectGameView(
-    new WinEffectGameView(
-        new WinEffectGameView(
-            frame, ifEnabled(frame::isConfettiEffectEnabled, effects::playConfetti)),
-        ifEnabled(frame::isFireworksEffectEnabled, effects::playFireworks)),
-    ifEnabled(frame::isMarksEffectEnabled, effects::playMarks));
+gamePanel.setWinEffects(List.of(
+        ifEnabled(setupState::isConfettiEnabled, effects::playConfetti),
+        ifEnabled(setupState::isFireworksEnabled, effects::playFireworks),
+        ifEnabled(setupState::isMarksEnabled, effects::playMarks)));
+
+private static Runnable ifEnabled(BooleanSupplier enabled, Runnable effect) {
+    return () -> {
+        if (enabled.getAsBoolean()) {
+            effect.run();
+        }
+    };
+}
 ```
 
 Three win-celebration effects (confetti, fireworks, twinkling X's/O's) are
-stacked around the base `MainFrame` view, one `WinEffectGameView` per
-effect. `MainFrame` itself is completely unaware this feature exists —
-every layer just forwards to the one inside it, and only adds behavior
-when the status is a win. This is the textbook motivating case for
-Decorator: without it, supporting "confetti only," "fireworks only," and
-"all three together" would mean a new subclass for every combination.
+composed into a list, each wrapped by `ifEnabled`, and `GamePanel` runs
+them all whenever a game is won. `GamePanel` has no idea which effects are
+switched on or how many there are — it just iterates the list. This is
+Decorator in its functional form: instead of a chain of nested view objects,
+each `ifEnabled` wrapper adds behavior around a `Runnable` and the collection
+is passed in whole. Supporting "confetti only," "fireworks only," or "all
+three together" is now just a question of which wrappers AppBuilder puts in
+the list, with no new subclasses anywhere.
 
 ---
 
@@ -119,8 +142,9 @@ used to keep a framework-specific implementation behind a
 framework-agnostic port.
 
 **Where:**
-- [`UiScheduler`](src/main/java/com/tictactoe/adapters/UiScheduler.java) (port) ↔ [`SwingUiScheduler`](src/main/java/com/tictactoe/infra/ui/SwingUiScheduler.java) (adapter)
-- [`GameView`](src/main/java/com/tictactoe/adapters/GameView.java) (port) ↔ [`MainFrame`](src/main/java/com/tictactoe/infra/ui/MainFrame.java) (adapter)
+- [`UiScheduler`](src/main/java/framework/UiScheduler.java) (port) ↔ [`SwingUiScheduler`](src/main/java/framework/SwingUiScheduler.java) (adapter)
+- [`SaveGameDataAccess`](src/main/java/persistence/save_game/use_case/SaveGameDataAccess.java) / [`LoadGameDataAccess`](src/main/java/persistence/load_game/use_case/LoadGameDataAccess.java) (ports) ↔ [`FileGameDataAccessObject`](src/main/java/data_access/FileGameDataAccessObject.java) (adapter)
+- [`GameSessionDataAccess`](src/main/java/game/GameSessionDataAccess.java) (port) ↔ [`InMemoryGameSession`](src/main/java/data_access/InMemoryGameSession.java) (adapter)
 
 ```java
 public final class SwingUiScheduler implements UiScheduler {
@@ -138,14 +162,17 @@ public final class SwingUiScheduler implements UiScheduler {
 }
 ```
 
-`GameController` (in `adapters`) needs to run AI move calculations off the
-UI thread and then hop back onto it — but `adapters` must never import
-Swing. `UiScheduler` is the port it depends on instead; `SwingUiScheduler`
-(in `infra`) adapts Swing's `SwingUtilities.invokeLater` and an
-`ExecutorService` to that port. This is what makes the codebase's Clean
-Architecture layering (see `CLAUDE.md`) actually enforceable at compile
-time, not just a convention: `adapters` physically cannot `import
-javax.swing.*`.
+The `request_ai_move` presenter needs to run an AI move search off the UI
+thread and then hop back onto it — but the presentation layer must never
+import Swing. `UiScheduler` is the port it depends on instead;
+`SwingUiScheduler` adapts Swing's `SwingUtilities.invokeLater` and an
+`ExecutorService` to that port. The persistence and session ports are the
+same idea applied to storage: the use cases depend on
+`SaveGameDataAccess`/`LoadGameDataAccess` and `GameSessionDataAccess`
+interfaces, and `data_access` provides the file-backed and in-memory
+adapters. This is what makes the Clean Architecture layering (see
+`AGENTS.md`) actually enforceable at compile time, not just a convention:
+the capabilities physically cannot `import javax.swing.*` or open files.
 
 ---
 
@@ -157,7 +184,7 @@ javax.swing.*`.
 interface, and let the algorithm vary independently of the code that uses
 it.
 
-**Where:** [`AiStrategy`](src/main/java/com/tictactoe/domain/ai/AiStrategy.java), implemented by [`RandomAiStrategy`](src/main/java/com/tictactoe/domain/ai/RandomAiStrategy.java), [`EasyAiStrategy`](src/main/java/com/tictactoe/domain/ai/EasyAiStrategy.java), and [`MinimaxAiStrategy`](src/main/java/com/tictactoe/domain/ai/MinimaxAiStrategy.java)
+**Where:** [`AiStrategy`](src/main/java/game/ai/AiStrategy.java), implemented by [`RandomAiStrategy`](src/main/java/game/ai/RandomAiStrategy.java), [`EasyAiStrategy`](src/main/java/game/ai/EasyAiStrategy.java), and [`MinimaxAiStrategy`](src/main/java/game/ai/MinimaxAiStrategy.java)
 
 ```java
 public interface AiStrategy {
@@ -165,13 +192,13 @@ public interface AiStrategy {
 }
 ```
 
-[`RequestAiMoveUseCase`](src/main/java/com/tictactoe/application/usecase/RequestAiMoveUseCase.java)
-is handed an `AiStrategy` and calls `selectMove` without knowing or caring
-whether it's picking a random empty cell, checking for an immediate
-win/block, or running minimax with alpha-beta pruning. Each
-implementation is a fully independent algorithm — this is what
-distinguishes Strategy from Template Method below: here the *entire*
-algorithm varies, not just a few steps of a shared skeleton.
+[`RequestAiMoveInteractor`](src/main/java/play/request_ai_move/use_case/RequestAiMoveInteractor.java)
+is handed an `AiStrategy` (from the factory above) and calls `selectMove`
+without knowing or caring whether it's picking a random empty cell, checking
+for an immediate win/block, or running minimax with alpha-beta pruning. Each
+implementation is a fully independent algorithm — this is what distinguishes
+Strategy from Template Method below: here the *entire* algorithm varies, not
+just a few steps of a shared skeleton.
 
 ---
 
@@ -181,12 +208,22 @@ algorithm varies, not just a few steps of a shared skeleton.
 as an object with a uniform "execute" entry point, decoupling the thing
 that triggers an operation from the code that performs it.
 
-**Where:** [`StartNewGameUseCase`](src/main/java/com/tictactoe/application/usecase/StartNewGameUseCase.java), [`MakeHumanMoveUseCase`](src/main/java/com/tictactoe/application/usecase/MakeHumanMoveUseCase.java), [`RequestAiMoveUseCase`](src/main/java/com/tictactoe/application/usecase/RequestAiMoveUseCase.java)
+**Where:** [`StartNewGameInteractor`](src/main/java/setup/start_new_game/use_case/StartNewGameInteractor.java), [`MakeHumanMoveInteractor`](src/main/java/play/make_human_move/use_case/MakeHumanMoveInteractor.java), [`RequestAiMoveInteractor`](src/main/java/play/request_ai_move/use_case/RequestAiMoveInteractor.java)
 
 ```java
-public final class MakeHumanMoveUseCase {
-    public GameState execute(GameState state, Position position) {
-        return state.applyMove(position);
+public final class MakeHumanMoveInteractor implements MakeHumanMoveInputBoundary {
+    private final MakeHumanMoveOutputBoundary presenter;
+    private final GameSessionDataAccess session;
+
+    @Override
+    public void execute(MakeHumanMoveInputData inputData) {
+        final GameState current = session.getCurrentGameState();
+        if (current == null || current.isGameOver() || GameSessionRules.isAiTurn(...)) {
+            return;
+        }
+        final GameState updated = current.applyMove(inputData.position());
+        session.setCurrentGameState(updated);
+        presenter.prepareSuccessView(new MakeHumanMoveOutputData(updated, ...));
     }
 }
 ```
@@ -194,9 +231,11 @@ public final class MakeHumanMoveUseCase {
 Clean Architecture calls these "Interactors" or "Use Cases," but
 structurally each one *is* the Command pattern: a single class wrapping a
 single operation behind one `execute(...)` method, with no other public
-behavior. `GameController` holds references to all three and calls
-`execute` on whichever one a UI event demands, without needing to know
-how any of them work internally.
+behavior. Each capability's thin controller holds its `InputBoundary` and
+calls `execute` on whichever one a UI event demands, without needing to
+know how any of them work internally. Interactors stay `void` and report
+through the injected `OutputBoundary` (the presenter) — the view never
+learns how a move was applied.
 
 ---
 
@@ -205,7 +244,7 @@ how any of them work internally.
 **Intent:** Let an object's behavior change based on which of a fixed set
 of states it's in, typically by giving each state its own class.
 
-**Where:** [`GameStatus`](src/main/java/com/tictactoe/domain/GameStatus.java) — a sealed interface permitting only [`InProgress`](src/main/java/com/tictactoe/domain/InProgress.java), [`Win`](src/main/java/com/tictactoe/domain/Win.java), and [`Draw`](src/main/java/com/tictactoe/domain/Draw.java)
+**Where:** [`GameStatus`](src/main/java/game/domain/GameStatus.java) — a sealed interface permitting only [`InProgress`](src/main/java/game/domain/InProgress.java), [`Win`](src/main/java/game/domain/Win.java), and [`Draw`](src/main/java/game/domain/Draw.java)
 
 ```java
 public sealed interface GameStatus permits InProgress, Win, Draw {}
@@ -217,9 +256,9 @@ virtual method that the client calls polymorphically (the classic GoF
 shape), the *client* pattern-matches on which state it has, and the
 compiler guarantees every `instanceof` chain is exhaustive because the
 interface is `sealed`. See it consumed in
-[`GameViewModelMapper`](src/main/java/com/tictactoe/adapters/GameViewModelMapper.java)
+[`GameViewModelMapper`](src/main/java/play/GameViewModelMapper.java)
 and
-[`MinimaxAiStrategy`](src/main/java/com/tictactoe/domain/ai/MinimaxAiStrategy.java#L47-L52).
+[`MinimaxAiStrategy`](src/main/java/game/ai/MinimaxAiStrategy.java#L49-L52).
 It's worth comparing this to classic State: here the *data* differs per
 state (a `Win` carries a winner and a winning line; `InProgress` and
 `Draw` carry nothing), which is awkward to express with polymorphic
@@ -233,7 +272,7 @@ methods but natural with a sealed hierarchy of records.
 deferring specific steps to subclasses, so the overall structure can't
 drift between implementations even as the details vary.
 
-**Where:** `WinEffect` (private abstract nested class) in [`EffectOverlayPanel`](src/main/java/com/tictactoe/infra/ui/EffectOverlayPanel.java), extended by `ConfettiEffect`, `FireworksEffect`, and `MarksEffect`
+**Where:** `WinEffect` (private abstract nested class) in [`EffectOverlayPanel`](src/main/java/play/EffectOverlayPanel.java#L104-L143), extended by `ConfettiEffect`, `FireworksEffect`, and `MarksEffect`
 
 ```java
 private abstract static class WinEffect {
@@ -243,12 +282,12 @@ private abstract static class WinEffect {
         advance(now);
         if (isExpired(now)) { clearParticles(); active = false; }
     }
-    final void paint(Graphics2D g2) { if (active) paintParticles(g2); }
+    final void paint(Graphics2D g2, long now) { if (active) paintParticles(g2, now); }
 
     abstract void spawnParticles(int width, int height);
     abstract void advance(long now);
     abstract boolean isExpired(long now);
-    abstract void paintParticles(Graphics2D g2);
+    abstract void paintParticles(Graphics2D g2, long now);
     abstract void clearParticles();
 }
 ```
@@ -274,8 +313,8 @@ be notified automatically when it changes, without the subject needing
 to know anything about its observers beyond the notification interface.
 
 **Where:**
-- Native Swing listeners in [`SetupPanel`](src/main/java/com/tictactoe/infra/ui/SetupPanel.java) (`ItemListener`, `ChangeListener`, `ActionListener`) and [`BoardPanel`](src/main/java/com/tictactoe/infra/ui/BoardPanel.java) (`ActionListener` per cell button).
-- A lighter, one-way variant: [`GameController`](src/main/java/com/tictactoe/adapters/GameController.java) pushes render calls to whatever `GameView` it holds via `displayBoard`/`displayStatus`/`displayError`.
+- The view-model pattern: views register as a `PropertyChangeListener` on their view model — [`SetupPanel`](src/main/java/setup/SetupPanel.java#L58) on `SetupViewModel`, [`GamePanel`](src/main/java/play/GamePanel.java#L32) on `GameViewModel` — and render from `evt.getNewValue()` whenever a presenter calls `firePropertyChanged()`.
+- Native Swing listeners in [`SetupPanel`](src/main/java/setup/SetupPanel.java) (`ItemListener`, `ChangeListener`, `ActionListener`), [`BoardPanel`](src/main/java/play/BoardPanel.java) (`ActionListener` per cell button), and [`StatusPanel`](src/main/java/play/StatusPanel.java) (`ActionListener` on Save/Restart/Change Settings).
 
 ```java
 boardSizeSpinner.addChangeListener(e -> clampWinLengthToBoardSize());
@@ -284,12 +323,12 @@ boardSizeSpinner.addChangeListener(e -> clampWinLengthToBoardSize());
 The Swing listeners are the textbook shape of Observer — a `JSpinner`
 (subject) notifies a registered `ChangeListener` (observer) whenever its
 value changes, with no compile-time dependency between them beyond the
-listener interface. The controller→view relationship is a related but
-weaker idea: there's exactly one observer (`GameView`), it's supplied at
-construction rather than registered dynamically, and there's no
-subscribe/unsubscribe — closer to a "push-based callback" than full
-Observer, but built from the same motivation (decouple the producer of a
-change from whoever needs to react to it).
+listener interface. The view-model pattern is the same idea at the
+application level: a presenter mutates the shared `GameRenderState` and
+fires one property change; every registered view re-renders from the new
+value. This is what lets `SetupPanel` and `GamePanel` react to changes
+produced by presenters in entirely different capabilities without either
+side holding a reference to the other.
 
 ---
 
@@ -301,61 +340,71 @@ here.
 
 ### Mediator / Presenter (MVP)
 
-[`GameController`](src/main/java/com/tictactoe/adapters/GameController.java)
-sits between the passive `GameView`, the three use cases, and the
-`AiStrategy`, coordinating every interaction between them. `MainFrame`
-never calls a use case directly — it only renders whatever view model the
-controller hands it. That makes this Model-View-**Presenter** rather than
-classic MVC (where the view often talks to the model directly): the view
-here is entirely passive, and the controller/presenter owns all
-coordination logic, which is also what makes `GameControllerTest` able to
-exercise the whole app without a single Swing component.
+Each capability follows the CAWithBuilder shape: a thin **controller**
+builds `InputData` from view primitives, the **interactor** runs the use
+case, and the **presenter** renders the `OutputData` into the shared view
+model and fires a property change. Navigation is presenter-driven through
+[`ViewManager`](src/main/java/framework/ViewManager.java) +
+[`ViewManagerModel`](src/main/java/framework/ViewManagerModel.java).
+Views like [`GamePanel`](src/main/java/play/GamePanel.java) and
+[`SetupPanel`](src/main/java/setup/SetupPanel.java) are entirely passive —
+they only write widget values into the state bean and render what the
+presenter publishes. That makes this Model-View-**Presenter** rather than
+classic MVC (where the view often talks to the model directly): the
+presenter owns all coordination logic, which is also what lets tests
+exercise a whole use case with a real view model and a mock presenter,
+with no Swing component in sight.
 
 ### Mapper / DTO
 
-[`GameViewModelMapper`](src/main/java/com/tictactoe/adapters/GameViewModelMapper.java)
-translates the domain's `GameState` into UI-facing `BoardViewModel` and
-`StatusViewModel` records. This keeps `domain` ignorant of anything
-presentation-related (no `GameState` field ever needs to know it might
-someday be rendered as a color or a string), and keeps the mapping logic
-itself in one testable, static-method place rather than scattered across
-Swing components.
+[`GameViewModelMapper`](src/main/java/play/GameViewModelMapper.java)
+translates the domain's `GameState` into presentation-facing
+`BoardRenderState` and `StatusRenderState` records. This keeps
+`game/domain` ignorant of anything presentation-related (no `GameState`
+field ever needs to know it might someday be rendered as a color or a
+string), and keeps the mapping logic itself in one testable, static-method
+place rather than scattered across Swing components.
 
 ### Immutable Value Object / Persistent Data Structure
 
-[`Board.placeMark()`](src/main/java/com/tictactoe/domain/Board.java#L30-L40)
+[`Board.placeMark()`](src/main/java/game/domain/Board.java#L34)
 copies its backing array and returns a *new* `Board` rather than mutating
-in place; [`GameState.applyMove()`](src/main/java/com/tictactoe/domain/GameState.java#L18-L31)
+in place; [`GameState.applyMove()`](src/main/java/game/domain/GameState.java#L20)
 likewise returns a new `GameState`. Combined with `Position`, `GameConfig`,
-`NewGameRequest`, and every `viewmodel` type being a Java `record`, this
-gives the whole domain model value semantics: nothing holding a reference
-to a `GameState` needs to worry about another part of the program
-mutating it out from under them.
+and every render type (`BoardRenderState`, `StatusRenderState`,
+`CellRenderState`, `CellSymbol`) being a Java `record`, this gives the
+whole domain model value semantics: nothing holding a reference to a
+`GameState` needs to worry about another part of the program mutating it
+out from under them — which is exactly what lets the async AI move share a
+state snapshot safely across threads.
 
 ### Non-instantiable Utility Class
 
-[`WinChecker`](src/main/java/com/tictactoe/domain/WinChecker.java),
-[`LineGenerator`](src/main/java/com/tictactoe/domain/LineGenerator.java),
-[`BoardEvaluator`](src/main/java/com/tictactoe/domain/ai/BoardEvaluator.java),
-and [`MoveOrderer`](src/main/java/com/tictactoe/domain/ai/MoveOrderer.java)
+[`WinChecker`](src/main/java/game/domain/WinChecker.java),
+[`LineGenerator`](src/main/java/game/domain/LineGenerator.java),
+[`BoardEvaluator`](src/main/java/game/ai/BoardEvaluator.java),
+and [`MoveOrderer`](src/main/java/game/ai/MoveOrderer.java)
 are all `final` classes with a private no-arg constructor and only static
 methods — pure functions grouped by topic, not objects with identity or
 state. Not the GoF Singleton (there's no lazy instantiation, no instance
 at all, and nothing controls *access* to a shared instance) — just the
 "this doesn't need to be an object" idiom (Effective Java, Item 4).
 
-### Test Double (Fake / Stub / Spy)
+### Test Double (Mock / Fake / Stub / Spy)
 
-[`FakeGameView`](src/test/java/com/tictactoe/adapters/FakeGameView.java)
-records whatever was last rendered instead of drawing anything (a
-**Fake**); [`ImmediateUiScheduler`](src/test/java/com/tictactoe/adapters/ImmediateUiScheduler.java)
-runs "background" and "UI thread" work synchronously on the calling
-thread (a **Stub**); [`CapturingUiScheduler`](src/test/java/com/tictactoe/adapters/CapturingUiScheduler.java)
-queues tasks so a test can step through them one at a time and assert on
-in-between states (a **Spy**). All three exist only because `GameView`
-and `UiScheduler` are ports (see Adapter, above) — without that
-abstraction boundary, tests would have no seam to substitute a double
-into.
+- **Mocks** for the boundaries: tests `mock(...)` the `OutputBoundary`
+  (presenter) and the data-access ports, then `verify` what was passed —
+  e.g. [`LoadGameInteractorTest`](src/test/java/persistence/load_game/use_case/LoadGameInteractorTest.java)
+  asserts the presenter got the loaded `SavedGame` *and* that the real
+  `InMemoryGameSession` actually received the restored state.
+- [`CapturingUiScheduler`](src/test/java/game/testutil/CapturingUiScheduler.java)
+  queues background and UI tasks so a test can step through them one at a
+  time and assert on in-between states (a **Spy**).
+
+All of these exist only because `UiScheduler`, `GameSessionDataAccess`,
+`SaveGameDataAccess`, and `LoadGameDataAccess` are ports (see Adapter,
+above) — without those abstraction boundaries, tests would have no seam to
+substitute a double into.
 
 ---
 
@@ -366,7 +415,7 @@ been the wrong call:
 
 - **No Singleton.** Nothing in this program needs global, controlled
   access to a single instance — every collaborator is constructed once
-  and passed in explicitly (see `GameControllerBuilder` and `Main.java`).
+  and passed in explicitly (see `AppBuilder` and `Main.java`).
 - **No Composite or Visitor**, despite `GameStatus` being a sealed
   hierarchy — the hierarchy is flat (three leaf types, no tree structure)
   and consumers already get exhaustive, type-safe dispatch for free from
@@ -374,6 +423,11 @@ been the wrong call:
   ceremony.
 - **No Chain of Responsibility.** There's no pipeline of handlers that
   might or might not process a request and pass it along.
+- **The win effects are no longer a Decorator chain of views.** An earlier
+  version wrapped `GameView` in nested `WinEffectGameView` decorators; the
+  refactor replaced that with a plain `List<Runnable>` of effects (see
+  Decorator above) because the effects only ever fired on the game screen
+  — a one-screen concern belongs in the view, not in a view hierarchy.
 
 A small codebase doesn't need every pattern — the value of each pattern
 above is that it was solving a real, specific problem (avoiding a
