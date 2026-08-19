@@ -4,9 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 
-import game.GameViewModel;
+import data_access.InMemoryGameSession;
 import game.domain.AiDifficulty;
 import game.domain.GameConfig;
+import game.domain.GameMode;
 import game.domain.GameState;
 import game.domain.Position;
 import game.request_ai_move.use_case.RequestAiMoveInputBoundary;
@@ -28,23 +29,22 @@ class RequestAiMoveControllerTest {
     @Mock
     private RequestAiMoveInputBoundary requestAiMoveUseCase;
 
-    private GameViewModel gameViewModel;
+    private InMemoryGameSession session;
     private CapturingUiScheduler scheduler;
     private RequestAiMoveController controller;
 
     @BeforeEach
     void setUp() {
-        gameViewModel = new GameViewModel();
+        session = new InMemoryGameSession();
         scheduler = new CapturingUiScheduler();
-        controller = new RequestAiMoveController(requestAiMoveUseCase, gameViewModel, scheduler);
+        controller = new RequestAiMoveController(requestAiMoveUseCase, session, scheduler);
     }
 
     @Test
     void execute_RunsInteractorInBackgroundWithSnapshotAndDifficulty() {
-        game.domain.GameState current = game.domain.GameState.newGame(CONFIG_3X3);
-        game.domain.GameState base = current.applyMove(new Position(0, 0));
-        gameViewModel.getSession().setCurrentGameState(base);
-        gameViewModel.getSession().setDifficulty(Optional.of(AiDifficulty.EASY));
+        GameState current = GameState.newGame(CONFIG_3X3);
+        GameState base = current.applyMove(new Position(0, 0));
+        session.setCurrentGame(base, GameMode.HUMAN_VS_AI, Optional.of(AiDifficulty.EASY));
 
         controller.execute();
 
@@ -61,8 +61,8 @@ class RequestAiMoveControllerTest {
 
     @Test
     void execute_NoDifficulty_Throws() {
-        game.domain.GameState current = game.domain.GameState.newGame(CONFIG_3X3);
-        gameViewModel.getSession().setCurrentGameState(current);
+        GameState current = GameState.newGame(CONFIG_3X3);
+        session.setCurrentGameState(current);
 
         assertThatThrownBy(() -> controller.execute()).isInstanceOf(NullPointerException.class);
     }

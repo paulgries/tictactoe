@@ -16,6 +16,11 @@ public final class GameFixtures {
     private GameFixtures() {
     }
 
+    /** A fresh 3x3 game. */
+    public static GameState newGame3x3() {
+        return GameState.newGame(CONFIG_3X3);
+    }
+
     /** A 3x3 game won by X on the top row. */
     public static GameState wonByX() {
         return GameState.newGame(CONFIG_3X3)

@@ -4,17 +4,15 @@ import framework.ViewManagerModel;
 import game.GameRenderState;
 import game.GameViewModel;
 import game.GameViewModelMapper;
-import game.SessionState;
 import game.setup.SetupViewModel;
 import game.start_new_game.use_case.StartNewGameOutputBoundary;
 import game.start_new_game.use_case.StartNewGameOutputData;
 
 /**
- * The Presenter for the Start New Game Use Case. Stashes the session data
- * (mode and AI difficulty) in the shared game view model, updates the render
- * state, and fires a property change so the game view re-renders. Failures
- * go to the setup view model, whose view shows them. Navigation is
- * presenter-driven through the {@link ViewManagerModel}, as in
+ * The Presenter for the Start New Game Use Case. Renders the fresh game
+ * state from the output data and fires a property change so the game view
+ * re-renders. Failures go to the setup view model, whose view shows them.
+ * Navigation is presenter-driven through the {@link ViewManagerModel}, as in
  * CAWithBuilder.
  */
 public class StartNewGamePresenter implements StartNewGameOutputBoundary {
@@ -34,10 +32,6 @@ public class StartNewGamePresenter implements StartNewGameOutputBoundary {
 
     @Override
     public void prepareSuccessView(StartNewGameOutputData outputData) {
-        final SessionState session = gameViewModel.getSession();
-        session.setCurrentGameState(outputData.gameState());
-        session.setMode(outputData.mode());
-        session.setDifficulty(outputData.difficulty());
         final GameRenderState render = gameViewModel.getState();
         render.setBoard(GameViewModelMapper.toBoardRenderState(outputData.gameState()));
         render.setStatus(GameViewModelMapper.toStatusRenderState(outputData.gameState()));

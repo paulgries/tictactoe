@@ -40,15 +40,12 @@ class LoadGamePresenterTest {
     }
 
     @Test
-    void prepareSuccessView_RestoresSessionAndRenderAndNavigates() {
+    void prepareSuccessView_RendersAndNavigates() {
         SavedGame savedGame = new SavedGame(
                 GameFixtures.wonByX(), GameMode.HUMAN_VS_AI, Optional.of(AiDifficulty.MEDIUM));
 
         presenter.prepareSuccessView(new LoadGameOutputData(savedGame));
 
-        assertThat(gameViewModel.getSession().getCurrentGameState()).isEqualTo(savedGame.gameState());
-        assertThat(gameViewModel.getSession().getMode()).isEqualTo(GameMode.HUMAN_VS_AI);
-        assertThat(gameViewModel.getSession().getDifficulty()).contains(AiDifficulty.MEDIUM);
         GameRenderState render = gameViewModel.getState();
         assertThat(render.getBoard().cells()).hasSize(9);
         assertThat(render.getBoard().cells().get(0).symbol()).isEqualTo(CellSymbol.X);

@@ -2,6 +2,7 @@ package game.request_ai_move;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import data_access.InMemoryGameSession;
 import game.GameViewModel;
 import game.domain.GameConfig;
 import game.domain.Position;
@@ -17,6 +18,7 @@ class RequestAiMovePresenterTest {
     private static final GameConfig CONFIG_3X3 = new GameConfig(3, 3);
 
     private GameViewModel gameViewModel;
+    private InMemoryGameSession session;
     private CapturingUiScheduler scheduler;
     private RequestAiMovePresenter presenter;
     private int fireCount;
@@ -26,8 +28,9 @@ class RequestAiMovePresenterTest {
         gameViewModel = new GameViewModel();
         PropertyChangeListener listener = evt -> fireCount++;
         gameViewModel.addPropertyChangeListener(listener);
+        session = new InMemoryGameSession();
         scheduler = new CapturingUiScheduler();
-        presenter = new RequestAiMovePresenter(gameViewModel, scheduler);
+        presenter = new RequestAiMovePresenter(gameViewModel, scheduler, session);
     }
 
     @Test
@@ -35,16 +38,16 @@ class RequestAiMovePresenterTest {
         game.domain.GameState base = game.domain.GameState.newGame(CONFIG_3X3)
             .applyMove(new Position(0, 0));
         game.domain.GameState moved = base.applyMove(new Position(1, 1));
-        gameViewModel.getSession().setCurrentGameState(base);
+        session.setCurrentGameState(base);
 
         presenter.prepareSuccessView(new RequestAiMoveOutputData(moved, base));
 
         assertThat(scheduler.pendingUiTasks()).isEqualTo(1);
-        assertThat(gameViewModel.getSession().getCurrentGameState()).isEqualTo(base);
+        assertThat(session.getCurrentGameState()).isEqualTo(base);
 
         scheduler.runNextUiTask();
 
-        assertThat(gameViewModel.getSession().getCurrentGameState()).isEqualTo(moved);
+        assertThat(session.getCurrentGameState()).isEqualTo(moved);
         assertThat(gameViewModel.getState().getStatus().message()).isEqualTo("X's turn");
         assertThat(fireCount).isEqualTo(1);
     }
@@ -54,17 +57,17 @@ class RequestAiMovePresenterTest {
         game.domain.GameState base = game.domain.GameState.newGame(CONFIG_3X3)
             .applyMove(new Position(0, 0));
         game.domain.GameState moved = base.applyMove(new Position(1, 1));
-        gameViewModel.getSession().setCurrentGameState(base);
+        session.setCurrentGameState(base);
 
         presenter.prepareSuccessView(new RequestAiMoveOutputData(moved, base));
 
         // the session moved on (e.g. a restart) before the UI task ran
         game.domain.GameState fresh = GameFixtures.wonByX();
-        gameViewModel.getSession().setCurrentGameState(fresh);
+        session.setCurrentGameState(fresh);
 
         scheduler.runNextUiTask();
 
-        assertThat(gameViewModel.getSession().getCurrentGameState()).isEqualTo(fresh);
+        assertThat(session.getCurrentGameState()).isEqualTo(fresh);
         assertThat(fireCount).isZero();
     }
 

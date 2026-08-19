@@ -1,22 +1,22 @@
 package game;
 
 import game.domain.GameMode;
+import game.domain.GameState;
 
 /**
- * Presentation-side game rules shared by the make-human-move controller
- * (ignore clicks while the AI is to move) and presenter (hand off to the
- * AI request after a human move).
+ * Game rules shared by the make-human-move use case (ignore moves while the
+ * AI is to move, and report whether the AI is to move next). They live in
+ * the engine because both the interactor and the controller need them.
  */
 public final class GameSessionRules {
 
     private GameSessionRules() {
     }
 
-    public static boolean isAiTurn(SessionState session) {
-        return session.getMode() == GameMode.HUMAN_VS_AI
-            && session.getCurrentGameState() != null
-            && !session.getCurrentGameState().isGameOver()
-            && session.getCurrentGameState().currentTurn()
-                == game.domain.GameState.STARTING_MARK.other();
+    public static boolean isAiTurn(GameMode mode, GameState state) {
+        return mode == GameMode.HUMAN_VS_AI
+            && state != null
+            && !state.isGameOver()
+            && state.currentTurn() == GameState.STARTING_MARK.other();
     }
 }

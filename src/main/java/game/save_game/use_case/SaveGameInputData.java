@@ -1,14 +1,9 @@
 package game.save_game.use_case;
 
-import game.domain.AiDifficulty;
-import game.domain.GameMode;
-import game.domain.GameState;
-import java.util.Optional;
-
 /**
- * The input data for the Save Game Use Case: the current session, which the
- * controller snapshots from the shared view model.
+ * The input data for the Save Game Use Case. The session to save is read
+ * from the application-layer session by the interactor, so the controller
+ * has no view input to forward.
  */
-public record SaveGameInputData(
-        GameState gameState, GameMode mode, Optional<AiDifficulty> difficulty) {
+public record SaveGameInputData() {
 }

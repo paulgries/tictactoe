@@ -1,18 +1,16 @@
 package game.make_human_move;
 
 import game.GameRenderState;
-import game.GameSessionRules;
 import game.GameViewModel;
 import game.GameViewModelMapper;
-import game.SessionState;
 import game.make_human_move.use_case.MakeHumanMoveOutputBoundary;
 import game.make_human_move.use_case.MakeHumanMoveOutputData;
 
 /**
- * The Presenter for the Make Human Move Use Case. Updates the shared game
- * view model and fires a property change so the view re-renders; when the
- * move leaves the board on the AI's turn, hands off to the AI move request
- * (wired by the AppBuilder).
+ * The Presenter for the Make Human Move Use Case. Renders the updated state
+ * from the output data and fires a property change so the view re-renders;
+ * when the move leaves the board on the AI's turn, hands off to the AI move
+ * request (wired by the AppBuilder).
  */
 public class MakeHumanMovePresenter implements MakeHumanMoveOutputBoundary {
 
@@ -26,15 +24,13 @@ public class MakeHumanMovePresenter implements MakeHumanMoveOutputBoundary {
 
     @Override
     public void prepareSuccessView(MakeHumanMoveOutputData outputData) {
-        final SessionState session = gameViewModel.getSession();
-        session.setCurrentGameState(outputData.updatedState());
         final GameRenderState render = gameViewModel.getState();
         render.setBoard(GameViewModelMapper.toBoardRenderState(outputData.updatedState()));
         render.setStatus(GameViewModelMapper.toStatusRenderState(outputData.updatedState()));
         render.setMessage(null);
         gameViewModel.firePropertyChanged();
 
-        if (GameSessionRules.isAiTurn(session)) {
+        if (outputData.aiToMoveNext()) {
             requestAiMove.run();
         }
     }

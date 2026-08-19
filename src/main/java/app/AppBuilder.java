@@ -1,6 +1,8 @@
 package app;
 
+import app.MainFrame;
 import data_access.FileGameDataAccessObject;
+import data_access.InMemoryGameSession;
 import framework.SwingUiScheduler;
 import framework.ViewManager;
 import framework.ViewManagerModel;
@@ -50,6 +52,7 @@ public class AppBuilder {
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
     private final FileGameDataAccessObject fileGameDataAccessObject = new FileGameDataAccessObject(
             Path.of(System.getProperty("user.home"), ".tictactoe", "saved-game.txt"));
+    private final InMemoryGameSession inMemoryGameSession = new InMemoryGameSession();
 
     private MainFrame frame;
     private ViewManager viewManager;
@@ -83,10 +86,10 @@ public class AppBuilder {
 
     public AppBuilder addRequestAiMoveUseCase() {
         final RequestAiMovePresenter requestAiMovePresenter =
-                new RequestAiMovePresenter(gameViewModel, uiScheduler);
+                new RequestAiMovePresenter(gameViewModel, uiScheduler, inMemoryGameSession);
         requestAiMoveController = new RequestAiMoveController(
                 new RequestAiMoveInteractor(requestAiMovePresenter, aiStrategyFactory),
-                gameViewModel, uiScheduler);
+                inMemoryGameSession, uiScheduler);
         return this;
     }
 
@@ -98,7 +101,7 @@ public class AppBuilder {
         final MakeHumanMovePresenter makeHumanMovePresenter =
                 new MakeHumanMovePresenter(gameViewModel, requestAiMoveController::execute);
         final MakeHumanMoveController makeHumanMoveController = new MakeHumanMoveController(
-                new MakeHumanMoveInteractor(makeHumanMovePresenter), gameViewModel);
+                new MakeHumanMoveInteractor(makeHumanMovePresenter, inMemoryGameSession));
         gamePanel.setMakeHumanMoveController(makeHumanMoveController);
         return this;
     }
@@ -107,7 +110,7 @@ public class AppBuilder {
         final StartNewGamePresenter startNewGamePresenter = new StartNewGamePresenter(
                 gameViewModel, setupViewModel, viewManagerModel);
         final StartNewGameController startNewGameController = new StartNewGameController(
-                new StartNewGameInteractor(startNewGamePresenter, gameStateFactory));
+                new StartNewGameInteractor(startNewGamePresenter, gameStateFactory, inMemoryGameSession));
         setupPanel.setStartNewGameController(startNewGameController);
         gamePanel.setStartNewGameController(startNewGameController);
         return this;
@@ -116,7 +119,7 @@ public class AppBuilder {
     public AppBuilder addSaveGameUseCase() {
         final SaveGamePresenter saveGamePresenter = new SaveGamePresenter(gameViewModel);
         final SaveGameController saveGameController = new SaveGameController(
-                new SaveGameInteractor(saveGamePresenter, fileGameDataAccessObject), gameViewModel);
+                new SaveGameInteractor(saveGamePresenter, fileGameDataAccessObject, inMemoryGameSession));
         gamePanel.setSaveGameController(saveGameController);
         return this;
     }
@@ -125,7 +128,7 @@ public class AppBuilder {
         final LoadGamePresenter loadGamePresenter =
                 new LoadGamePresenter(gameViewModel, setupViewModel, viewManagerModel);
         final LoadGameController loadGameController = new LoadGameController(
-                new LoadGameInteractor(loadGamePresenter, fileGameDataAccessObject));
+                new LoadGameInteractor(loadGamePresenter, fileGameDataAccessObject, inMemoryGameSession));
         setupPanel.setLoadGameController(loadGameController);
         return this;
     }
