@@ -1,5 +1,6 @@
 package app;
 
+import data_access.FileGameDataAccessObject;
 import framework.SwingUiScheduler;
 import framework.ViewManager;
 import framework.ViewManagerModel;
@@ -28,7 +29,6 @@ import game.setup.SetupViewModel;
 import game.start_new_game.StartNewGameController;
 import game.start_new_game.StartNewGamePresenter;
 import game.start_new_game.use_case.StartNewGameInteractor;
-import game.storage.FileGameStore;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -48,7 +48,7 @@ public class AppBuilder {
     private final GameStateFactory gameStateFactory = new CommonGameStateFactory();
     private final AiStrategyFactory aiStrategyFactory = new CommonAiStrategyFactory();
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
-    private final FileGameStore fileGameStore = new FileGameStore(
+    private final FileGameDataAccessObject fileGameDataAccessObject = new FileGameDataAccessObject(
             Path.of(System.getProperty("user.home"), ".tictactoe", "saved-game.txt"));
 
     private MainFrame frame;
@@ -116,7 +116,7 @@ public class AppBuilder {
     public AppBuilder addSaveGameUseCase() {
         final SaveGamePresenter saveGamePresenter = new SaveGamePresenter(gameViewModel);
         final SaveGameController saveGameController = new SaveGameController(
-                new SaveGameInteractor(saveGamePresenter, fileGameStore), gameViewModel);
+                new SaveGameInteractor(saveGamePresenter, fileGameDataAccessObject), gameViewModel);
         gamePanel.setSaveGameController(saveGameController);
         return this;
     }
@@ -125,7 +125,7 @@ public class AppBuilder {
         final LoadGamePresenter loadGamePresenter =
                 new LoadGamePresenter(gameViewModel, setupViewModel, viewManagerModel);
         final LoadGameController loadGameController = new LoadGameController(
-                new LoadGameInteractor(loadGamePresenter, fileGameStore));
+                new LoadGameInteractor(loadGamePresenter, fileGameDataAccessObject));
         setupPanel.setLoadGameController(loadGameController);
         return this;
     }

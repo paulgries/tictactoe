@@ -43,8 +43,9 @@ repo-specific details) to carry the workflow forward.
   - `game/save_game/use_case` (persistence boundary: `SaveGameDataAccess`)
   - `game/load_game/use_case` (persistence boundary: `LoadGameDataAccess`)
   - `game/domain/` (shared domain model, incl. `SavedGame` snapshot)
-  - `game/storage/` (file-backed `SaveGameDataAccess`/`LoadGameDataAccess`
-    implementation)
+  - `data_access/` (file-backed `SaveGameDataAccess`/`LoadGameDataAccess`
+    implementation, `FileGameDataAccessObject` like CAWithBuilder's
+    `InMemoryUserDataAccessObject`)
   - `app/` (`Main`, `AppBuilder`, window shell `MainFrame`), `framework/`
     (generic, reusable: `ViewModel`, `ViewManagerModel`, `ViewManager`,
     `UiScheduler`/`SwingUiScheduler`, `Theme`)

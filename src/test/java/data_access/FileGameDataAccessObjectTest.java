@@ -1,4 +1,4 @@
-package game.storage;
+package data_access;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -19,18 +19,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class FileGameStoreTest {
+class FileGameDataAccessObjectTest {
 
     @TempDir
     Path tempDir;
 
     private Path file;
-    private FileGameStore store;
+    private FileGameDataAccessObject store;
 
     @BeforeEach
     void setUp() {
         file = tempDir.resolve("saved-game.txt");
-        store = new FileGameStore(file);
+        store = new FileGameDataAccessObject(file);
     }
 
     @Test
@@ -58,7 +58,7 @@ class FileGameStoreTest {
     @Test
     void save_AiGame_CreatesParentDirectories() throws IOException {
         Path nested = tempDir.resolve("nested").resolve("dir").resolve("saved-game.txt");
-        FileGameStore nestedStore = new FileGameStore(nested);
+        FileGameDataAccessObject nestedStore = new FileGameDataAccessObject(nested);
 
         nestedStore.save(new SavedGame(
                 GameFixtures.wonByX(), GameMode.TWO_PLAYER, Optional.empty()));

@@ -1,4 +1,4 @@
-package game.storage;
+package data_access;
 
 import game.domain.AiDifficulty;
 import game.domain.Board;
@@ -28,13 +28,13 @@ import java.util.Optional;
  * WinChecker}. A missing file means "no saved game"; anything else that does
  * not parse is a corrupt save.
  */
-public final class FileGameStore implements SaveGameDataAccess, LoadGameDataAccess {
+public final class FileGameDataAccessObject implements SaveGameDataAccess, LoadGameDataAccess {
 
     private static final String EMPTY_CELL = "_";
 
     private final Path file;
 
-    public FileGameStore(Path file) {
+    public FileGameDataAccessObject(Path file) {
         this.file = file;
     }
 
