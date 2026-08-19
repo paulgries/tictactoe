@@ -33,18 +33,21 @@ repo-specific details) to carry the workflow forward.
 - Structure: capability folder contains its `use_case` subpackage; layers live
   inside capabilities rather than top-level layers.
 - Example layout:
-  - `game/` (shared presentation beans and view-models)
-  - `game/setup/` (setup screen view + `SetupViewModel`/`SetupState`)
-  - `game/game_view/` (game screen view: `GamePanel`, board/status panels,
-    win-effect overlay)
-  - `game/start_new_game/use_case`
-  - `game/make_human_move/use_case`
-  - `game/request_ai_move/use_case`
-  - `game/save_game/use_case` (persistence boundary: `SaveGameDataAccess`)
-  - `game/load_game/use_case` (persistence boundary: `LoadGameDataAccess`)
+  - `game/` (engine: shared domain model and AI strategies, plus
+    `GameSessionDataAccess` and `GameSessionRules`)
   - `game/domain/` (shared domain model, incl. `SavedGame` snapshot)
+  - `game/ai/` (AI strategies and the `CommonAiStrategyFactory` registry)
+  - `setup/` (setup screen view + `SetupViewModel`/`SetupState`)
+  - `setup/start_new_game/` (controller/presenter) with `use_case`
+  - `play/` (game screen view: `GamePanel`, board/status panels, win-effect
+    overlay, and the shared render beans `GameViewModel`/`GameRenderState`)
+  - `play/make_human_move/` (controller/presenter) with `use_case`
+  - `play/request_ai_move/` (controller/presenter) with `use_case`
+  - `persistence/save_game/` (persistence boundary: `SaveGameDataAccess`)
+  - `persistence/load_game/` (persistence boundary: `LoadGameDataAccess`)
   - `data_access/` (file-backed `SaveGameDataAccess`/`LoadGameDataAccess`
-    implementation, `FileGameDataAccessObject` like CAWithBuilder's
+    implementation `FileGameDataAccessObject`, and the in-memory game session
+    `InMemoryGameSession`, like CAWithBuilder's
     `InMemoryUserDataAccessObject`)
   - `app/` (`Main`, `AppBuilder`, window shell `MainFrame`), `framework/`
     (generic, reusable: `ViewModel`, `ViewManagerModel`, `ViewManager`,
@@ -66,14 +69,16 @@ repo-specific details) to carry the workflow forward.
     writes widget values into the state as they change and the controller
     reads from it on Start; presenters put transient messages (e.g. invalid
     config, no saved game) in the state and the panel shows them.
-  - `GameViewModel` holds two separate states shared across the game use
-    cases — a `SessionState` (current domain state, mode, AI difficulty)
-    that controllers and presenters share, and a `GameRenderState`
-    (board/status/message) that the game view renders from. Presenters
-    update both and fire one property change; `GamePanel` renders from it
-    and shows the message dialog. Presentation-side rules shared by several
-    use cases (e.g. "is the AI to move?") live in a small static helper
-    (`GameSessionRules`), not on the state beans, which stay dumb.
+  - `GameViewModel` holds a `GameRenderState` (board/status/message) that
+    the game view renders from. Presenters update it and fire one property
+    change; `GamePanel` renders from it and shows the message dialog. The
+    current domain state, mode and AI difficulty live in the
+    application-layer `GameSessionDataAccess` (implemented by
+    `data_access/InMemoryGameSession`); interactors read and write it, and
+    the `request_ai_move` presenter uses it to discard stale background
+    results. Presentation-side rules shared by several use cases (e.g. "is
+    the AI to move?") live in a small static helper (`GameSessionRules`),
+    not on the state beans, which stay dumb.
 - Navigation is presenter-driven: a `framework/ViewManager` +
   `ViewManagerModel` (`extends ViewModel<String>`) switches the card layout,
   presenters navigate by setting the view name (e.g. on success), and pure
