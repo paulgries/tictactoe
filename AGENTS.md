@@ -43,9 +43,11 @@ repo-specific details) to carry the workflow forward.
   - `game/save_game/use_case` (persistence boundary: `SaveGameDataAccess`)
   - `game/load_game/use_case` (persistence boundary: `LoadGameDataAccess`)
   - `game/domain/` (shared domain model, incl. `SavedGame` snapshot)
+  - `game/storage/` (file-backed `SaveGameDataAccess`/`LoadGameDataAccess`
+    implementation)
   - `app/` (`Main`, `AppBuilder`, window shell `MainFrame`), `framework/`
     (generic, reusable: `ViewModel`, `ViewManagerModel`, `ViewManager`,
-    `UiScheduler`/`SwingUiScheduler`, `Theme`, `storage/`)
+    `UiScheduler`/`SwingUiScheduler`, `Theme`)
 - Build a `CommonUser`/`CommonUserFactory` style entity for domain models.
 - Each use case gets a boundary set under its `use_case` package:
   `InputBoundary`, `InputData`, `Interactor`, `OutputBoundary`, `OutputData`.

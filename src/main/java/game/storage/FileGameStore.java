@@ -1,4 +1,4 @@
-package framework.storage;
+package game.storage;
 
 import game.domain.AiDifficulty;
 import game.domain.Board;
