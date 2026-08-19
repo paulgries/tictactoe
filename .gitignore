@@ -1,5 +1,6 @@
 out/
 target/
+AGENT_TEMPLATE.md
 .idea/
 *.iml
 lib/

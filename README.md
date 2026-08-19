@@ -22,10 +22,10 @@ mvn clean test
 
 ## Documentation
 
-- `AGENTS.md` — project conventions and decisions for AI-assisted work.
-- `testing.md` — how the test suite is structured.
-- `bean.md` — what a "bean" is in the view-model pattern.
-- `DesignPatterns.md` — design patterns used in the project.
+- [`AGENTS.md`](AGENTS.md) — project conventions and decisions for AI-assisted work.
+- [`testing.md`](testing.md) — how the test suite is structured.
+- [`bean.md`](bean.md) — what a "bean" is in the view-model pattern.
+- [`DesignPatterns.md`](DesignPatterns.md) — design patterns used in the project.
 - `conversations/*.md` for LLM session transcripts.
 
 ## Choosable options
@@ -52,4 +52,5 @@ Independent on/off switches, also on the start screen:
 ## Credits
 
 Developed by Lindsey Shorser with Claude Code on August 12-13, 2026.
+
 Contributions by Paul Gries with various LLMs, mainly DeepSeek V4 Flash Free.

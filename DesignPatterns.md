@@ -7,7 +7,7 @@ definition). It's written for software design students who want to see
 these patterns in a small, complete, real system rather than an isolated
 toy example.
 
-The codebase follows Clean Architecture (see `AGENTS.md`): a `game` engine
+The codebase follows Clean Architecture (see [`AGENTS.md`](AGENTS.md)): a `game` engine
 (`game/domain` plus `game/ai`) sits at the center, the capabilities
 (`setup/`, `play/`, `persistence/`) each hold their own controllers,
 presenters, and `use_case` packages around it, and `data_access`,
@@ -171,7 +171,7 @@ same idea applied to storage: the use cases depend on
 `SaveGameDataAccess`/`LoadGameDataAccess` and `GameSessionDataAccess`
 interfaces, and `data_access` provides the file-backed and in-memory
 adapters. This is what makes the Clean Architecture layering (see
-`AGENTS.md`) actually enforceable at compile time, not just a convention:
+[`AGENTS.md`](AGENTS.md)) actually enforceable at compile time, not just a convention:
 the capabilities physically cannot `import javax.swing.*` or open files.
 
 ---
@@ -415,7 +415,7 @@ been the wrong call:
 
 - **No Singleton.** Nothing in this program needs global, controlled
   access to a single instance — every collaborator is constructed once
-  and passed in explicitly (see `AppBuilder` and `Main.java`).
+  and passed in explicitly (see [`AppBuilder`](src/main/java/app/AppBuilder.java) and [`Main.java`](src/main/java/app/Main.java)).
 - **No Composite or Visitor**, despite `GameStatus` being a sealed
   hierarchy — the hierarchy is flat (three leaf types, no tree structure)
   and consumers already get exhaustive, type-safe dispatch for free from
