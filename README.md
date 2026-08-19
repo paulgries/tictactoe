@@ -1,24 +1,31 @@
 # Tic-Tac-Toe
 
 A desktop Tic-Tac-Toe game, built in Java with a Swing UI. Play two-player
-locally or against a computer opponent on a configurable board, from the
-classic 3x3 up to a 10x10 board with a longer line needed to win.
+locally or against a computer opponent on a configurable board, from a 2x2
+up to a 10x10 board with a longer line needed to win.
 
-This was developed by Lindsey Shorser with Claude Code on August 12-13, 2026. For a description of the design patterns that were included, see `DesignPatterns.md`.
+## Requirements
+
+Maven and Java 17+.
 
 ## Running it
 
 ```
-./run.sh
+mvn compile exec:java
 ```
 
 ## Building & testing
 
-Requires Maven and Java 17+. Run the test suite with:
-
 ```
 mvn clean test
 ```
+
+## Documentation
+
+- `AGENTS.md` — project conventions and decisions for AI-assisted work.
+- `testing.md` — how the test suite is structured.
+- `bean.md` — what a "bean" is in the view-model pattern.
+- `DesignPatterns.md` — design patterns used in the project.
 
 ## Choosable options
 
@@ -32,7 +39,7 @@ Set on the start screen before each game:
   (takes an obvious win or block when available), or Difficult (plays a
   full lookahead search and rarely loses).
 
-## Toggle-able options
+## Toggleable options
 
 Independent on/off switches, also on the start screen:
 
@@ -41,5 +48,8 @@ Independent on/off switches, also on the start screen:
 - **Night Mode** — switches the whole UI between a light "Day Mode" and a
   dark "Night Mode" palette, live, without needing to restart.
 
+## Credits
 
-
+Developed by Lindsey Shorser with Claude Code on August 12-13, 2026.
+Contributions by Paul Gries with various LLMs, mainly DeepSeek V4 Flash Free.
+* See conversations/*.md for LLM session transcripts.
