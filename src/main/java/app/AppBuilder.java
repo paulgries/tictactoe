@@ -6,6 +6,7 @@ import framework.ViewManagerModel;
 import framework.storage.FileGameStore;
 import game.GameViewModel;
 import game.ai.AiStrategyFactory;
+import game.ai.CommonAiStrategyFactory;
 import game.domain.CommonGameStateFactory;
 import game.domain.GameStateFactory;
 import game.game_view.EffectOverlayPanel;
@@ -45,7 +46,7 @@ public class AppBuilder {
     private final SetupViewModel setupViewModel = new SetupViewModel();
     private final SwingUiScheduler uiScheduler = new SwingUiScheduler();
     private final GameStateFactory gameStateFactory = new CommonGameStateFactory();
-    private final AiStrategyFactory aiStrategyFactory = new AiStrategyFactory();
+    private final AiStrategyFactory aiStrategyFactory = new CommonAiStrategyFactory();
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
     private final FileGameStore fileGameStore = new FileGameStore(
             Path.of(System.getProperty("user.home"), ".tictactoe", "saved-game.txt"));

@@ -1,17 +1,14 @@
 package game.ai;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import game.domain.AiDifficulty;
-import game.ai.AiStrategy;
-import game.ai.EasyAiStrategy;
-import game.ai.MinimaxAiStrategy;
-import game.ai.RandomAiStrategy;
 import org.junit.jupiter.api.Test;
 
 class AiStrategyFactoryTest {
 
-    private final AiStrategyFactory factory = new AiStrategyFactory();
+    private final CommonAiStrategyFactory factory = new CommonAiStrategyFactory();
 
     @Test
     void easyDifficultyCreatesRandomAiStrategy() {
@@ -32,5 +29,20 @@ class AiStrategyFactoryTest {
         AiStrategy strategy = factory.create(AiDifficulty.DIFFICULT);
 
         assertThat(strategy).isInstanceOf(MinimaxAiStrategy.class);
+    }
+
+    @Test
+    void register_ThenCreate_UsesRegisteredStrategy() {
+        AiStrategy custom = mock(AiStrategy.class);
+        factory.register(AiDifficulty.EASY, () -> custom);
+
+        assertThat(factory.create(AiDifficulty.EASY)).isSameAs(custom);
+    }
+
+    @Test
+    void create_InvokesSupplierOnEveryCall() {
+        factory.register(AiDifficulty.EASY, () -> mock(AiStrategy.class));
+
+        assertThat(factory.create(AiDifficulty.EASY)).isNotSameAs(factory.create(AiDifficulty.EASY));
     }
 }

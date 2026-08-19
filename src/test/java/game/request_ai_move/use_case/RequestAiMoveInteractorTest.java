@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import game.ai.AiStrategyFactory;
+import game.ai.CommonAiStrategyFactory;
 import game.ai.EasyAiStrategy;
 import game.domain.AiDifficulty;
 import game.domain.GameConfig;
@@ -29,7 +29,7 @@ class RequestAiMoveInteractorTest {
 
     @BeforeEach
     void setUp() {
-        interactor = new RequestAiMoveInteractor(presenter, new AiStrategyFactory());
+        interactor = new RequestAiMoveInteractor(presenter, new CommonAiStrategyFactory());
     }
 
     @Test
